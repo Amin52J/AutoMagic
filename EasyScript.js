@@ -1,4 +1,4 @@
-//version 0.0.0
+//version 0.1.0
 
 
 window.EasyScript = function(selector) {
@@ -16,13 +16,48 @@ window.EasyScript = function(selector) {
         window.EasyScript.throwError('Selector must be a string');
         return false;
     }
+
+    //add class
+    //arguments: className
+    //------------string------------
+    function addClass() {
+        var arg = arguments;
+        Array.prototype.forEach.call(elems, function (elem, index) {
+            var classArray = arg[0].split(' ');
+            classArray.forEach(function (currentClass, index) {
+                if (elem.className.indexOf(currentClass) < 0) {
+                    elem.className += ' ' + currentClass;
+                }
+            });
+        });
+        return this;
+    }
+
+    //append
+    //arguments: tobeAppended
+    //-----------string , DOM--------------------
+    function append() {
+        var arg = arguments;
+        Array.prototype.forEach.call(elems, function (elem, index) {
+            if (typeof arg[0] === 'string') {
+                elem.innerHTML += arg[0];
+            }
+            else {
+                elem.appendChild(arg[0]);
+            }
+        });
+        return this;
+    }
     
     //closest
-    function closest(selector) {
+    //arguments: selector
+    //----------- string -------------
+    function closest() {
+        var arg = arguments;
         elem=elems[0];
         var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
         while (elem && elem.tagName.toLowerCase()!=='html') {
-            if (matchesSelector.call(elem, selector)) {
+            if (matchesSelector.call(elem, arg[0])) {
                 break;
             }
             elem = elem.parentNode;
@@ -31,6 +66,8 @@ window.EasyScript = function(selector) {
     };
     
     //add event listener
+    //arguments: event , targetSelector, callback(event)
+    //----------string-------string--------function---------
     function on() {
         var arg=arguments;
         if(arg.length<2){
@@ -52,8 +89,29 @@ window.EasyScript = function(selector) {
         }
         return this;
     };
-    
+
+    //prepend
+    //arguments: tobePrepended
+    //-----------string , DOM--------------------
+    function prepend() {
+        var arg = arguments;
+        Array.prototype.forEach.call(elems, function (elem, index) {
+            if (typeof arg[0] === 'string') {
+                elem.innerHTML = arg[0] + elem.innerHTML;
+            }
+            else if (elem.childNodes.length>0) {
+                elem.insertBefore(arg[0], elem.firstChild);
+            }
+            else {
+                elem.appendChild(arg[0]);
+            }
+        });
+        return this;
+    }
+
     //prop
+    //arguments: property , value
+    //------------string-----any------
     function prop() {
         var arg=arguments;  
         if(arg.length>1){
@@ -71,12 +129,45 @@ window.EasyScript = function(selector) {
         return this;
     }
 
+    //remove class
+    //arguments: className
+    //------------string--------------
+    function removeClass() {
+        var arg = arguments;
+        Array.prototype.forEach.call(elems, function (elem, index) {
+            var classArray = arg[0].split(' ');
+            classArray.forEach(function (currentClass, index) {
+                if (elem.className.indexOf(currentClass) > -1) {
+                    elem.className=elem.className.replace(currentClass, '');
+                }
+            });
+        });
+        return this;
+    }
+
+    //replace class
+    //arguments: tobeReplacedClassName, replacementClassName
+    //------------------string----------------string-----------------
+    function replaceClass() {
+        var arg = arguments;
+        Array.prototype.forEach.call(elems, function (elem, index) {
+            var regex = new RegExp(arg[0],'g');
+            elem.className = elem.className.replace(regex,arg[1]);
+        });
+        return this;
+    }
+
     //return the functions
     return {
+        addClass: addClass,
+        append:append,
         closest:closest,
         jsObject:elems,
-        on:on,
-        prop:prop
+        on: on,
+        prepend:prepend,
+        prop: prop,
+        removeClass: removeClass,
+        replaceClass:replaceClass
     }
 };
 
@@ -112,6 +203,7 @@ window.E = E = EasyScript = window.EasyScript;
 
 //-------------------------------------------------------
 //test
-E.ready(function() {
-    console.log(E('button').prop('disabled'));
+E.ready(function () {
+    E('.amin').addClass('amin brave creative creative amin');
+    //console.log(E('.amin').closest('.bahar'));
 });
