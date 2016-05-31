@@ -9,7 +9,12 @@ window.EasyScript = function(selector) {
         elems = [document];
     }
     else if(typeof selector==='object'){
-        elems=[selector];
+        if(Object.prototype.toString.call( selector ) === '[object Array]'){
+            elems = selector;
+        }
+        else{
+            elems=[selector];
+        }
     } else if (typeof selector === 'string') {
         elems = document.querySelectorAll(selector);
     } else {
@@ -17,7 +22,7 @@ window.EasyScript = function(selector) {
         return false;
     }
 
-    //add class
+    //add class to element
     //arguments: className
     //------------string------------
     function addClass() {
@@ -33,7 +38,7 @@ window.EasyScript = function(selector) {
         return this;
     }
 
-    //append
+    //append to element
     //arguments: tobeAppended
     //-----------string , DOM--------------------
     function append() {
@@ -49,7 +54,7 @@ window.EasyScript = function(selector) {
         return this;
     }
     
-    //closest
+    //get the closest ancestor with the given query
     //arguments: selector
     //----------- string -------------
     function closest() {
@@ -64,6 +69,70 @@ window.EasyScript = function(selector) {
         }
         return (elem.tagName.toLowerCase()=='html') ? null : window.EasyScript(elem);
     };
+    
+    //iterate over elements
+    //arguments: callback(element,value)
+    //-----------------function------------------
+    function each() {  
+        var arg=arguments;
+        Array.prototype.forEach.call(elems, function (elem,index) {
+            arg[0].apply(elem,[elem,index]);
+        });
+    }
+    
+    //get the next element
+    //arguments: selector
+    //------------string----------
+    function next() {
+        var arg=arguments,
+            elem=elems[0],
+            currentElement=elem.nextElementSibling;
+        if(arg.length>0){
+            var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
+            while(!matchesSelector.call(currentElement, arg[0]) && currentElement!==null){
+                currentElement=currentElement.nextElementSibling;
+            }
+        }
+        if(currentElement===null){
+            window.EasyScript.throwError('element not found');
+            return null;
+        }
+        else{
+            return window.EasyScript(currentElement);
+        }
+    }
+    
+    //get all the elements after
+    //arguments: selector
+    //------------string----------
+    function nextAll() {
+        var arg=arguments,
+            elem=elems[0],
+            currentElement=elem.nextElementSibling,
+            output=[];
+        if(arg.length>0){
+            var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
+            while(currentElement!==null){
+                if(matchesSelector.call(currentElement, arg[0])){
+                    output.push(currentElement);
+                }
+                currentElement=currentElement.nextElementSibling;
+            }
+        }
+        else{
+            while(currentElement!==null){
+                output.push(currentElement);
+                currentElement=currentElement.nextElementSibling;
+            }
+        }
+        if(output.length < 1){
+            window.EasyScript.throwError('element not found');
+            return null;
+        }
+        else{
+            return window.EasyScript(output);
+        }
+    }
     
     //add event listener
     //arguments: event , targetSelector, callback(event)
@@ -89,8 +158,23 @@ window.EasyScript = function(selector) {
         }
         return this;
     };
+    
+    //get the parent of the element
+    //arguments: selector
+    //------------string---------------
+    function parent() {  
+        var arg=arguments,
+            elem=elems[0];
+        var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
+        if(matchesSelector.call(elem,arg[0])){
+            return window.EasyScript(elem.parentNode);
+        }
+        else{
+            return false;
+        }
+    }
 
-    //prepend
+    //prepend to element
     //arguments: tobePrepended
     //-----------string , DOM--------------------
     function prepend() {
@@ -108,8 +192,62 @@ window.EasyScript = function(selector) {
         });
         return this;
     }
+    
+    //get the previous element
+    //arguments: selector
+    //------------string----------
+    function prev() {
+        var arg=arguments,
+            elem=elems[0],
+            currentElement=elem.previousElementSibling;
+        if(arg.length>0){
+            var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
+            while(!matchesSelector.call(currentElement, arg[0]) && currentElement!==null){
+                currentElement=currentElement.previousElementSibling;
+            }
+        }
+        if(currentElement===null){
+            window.EasyScript.throwError('element not found');
+            return null;
+        }
+        else{
+            return window.EasyScript(currentElement);
+        }
+    }
+    
+    //get all the elements before
+    //arguments: selector
+    //------------string----------
+    function prevAll() {
+        var arg=arguments,
+            elem=elems[0],
+            currentElement=elem.previousElementSibling,
+            output=[];
+        if(arg.length>0){
+            var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
+            while(currentElement!==null){
+                if(matchesSelector.call(currentElement, arg[0])){
+                    output.push(currentElement);
+                }
+                currentElement=currentElement.previousElementSibling;
+            }
+        }
+        else{
+            while(currentElement!==null){
+                output.push(currentElement);
+                currentElement=currentElement.previousElementSibling;
+            }
+        }
+        if(output.length < 1){
+            window.EasyScript.throwError('element not found');
+            return null;
+        }
+        else{
+            return window.EasyScript(output);
+        }
+    }
 
-    //prop
+    //get or set property value
     //arguments: property , value
     //------------string-----any------
     function prop() {
@@ -129,7 +267,7 @@ window.EasyScript = function(selector) {
         return this;
     }
 
-    //remove class
+    //remove class from the element
     //arguments: className
     //------------string--------------
     function removeClass() {
@@ -145,7 +283,7 @@ window.EasyScript = function(selector) {
         return this;
     }
 
-    //replace class
+    //replace class of the element
     //arguments: tobeReplacedClassName, replacementClassName
     //------------------string----------------string-----------------
     function replaceClass() {
@@ -156,47 +294,132 @@ window.EasyScript = function(selector) {
         });
         return this;
     }
+    
+    //get the siblings that match the selector
+    //arguments: selector
+    //------------string--------------
+    function siblings() {  
+        var arg=arguments,
+            elem=elems[0],
+            output=[];
+        if(arg.length>0){
+            var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
+            elem.parentNode.childNodes.forEach(function (v,i) {  
+                if(v!==elem && v.nodeType===1 && matchesSelector.call(v, arg[0])){
+                    output.push(v);
+                }
+            });
+        }
+        else{
+            elem.parentNode.childNodes.forEach(function (v,i) {  
+                if(v!==elem && v.nodeType===1){
+                    output.push(v);
+                }
+            });
+        }
+        return window.EasyScript(output);
+    }
+    
+    //get or set the value of the selected element
+    //arguments: value
+    //-----------string--------------------
+    function val() {
+        var arg=arguments;
+        if(elems.length>1){
+            if(arg.length>0){
+                Array.prototype.forEach.call(elems, function (elem, index) {
+                    elem.value=arg[0];
+                });
+                return this;
+            }
+            else{
+                var output=[];
+                Array.prototype.forEach.call(elems, function (elem, index) {
+                    output.push({
+                        element:window.EasyScript(elem),
+                        value:elem.value
+                    });
+                });
+                return output;
+            }
+        }
+        else{
+            elem=elems[0];
+            if(arg.length>0){
+                elem.value=arg[0];
+                return this;
+            }
+            else{
+                return elem.value;
+            }
+        }
+    }
 
     //return the functions
     return {
         addClass: addClass,
         append:append,
         closest:closest,
+        each:each,
         jsObject:elems,
+        next:next,
+        nextAll:nextAll,
         on: on,
+        parent:parent,
         prepend:prepend,
+        prev:prev,
+        prevAll:prevAll,
         prop: prop,
         removeClass: removeClass,
-        replaceClass:replaceClass
+        replaceClass:replaceClass,
+        siblings:siblings,
+        val:val
     }
 };
 
-//throw error
-window.EasyScript.throwError = function(text) {
-    console.error(text);
+//iterate over array or object
+//arguments: currentInstance , callback(value,index)
+//-------------array,object----function----------
+window.EasyScript.each=function () {  
+    var arg=arguments;
+    arg[0].forEach(arg[1]);
 };
 
 //document ready
-window.EasyScript.ready = function(callback) {
+//arguments: callback
+//-----------function-------------
+window.EasyScript.ready = function() {
+    var arg=arguments;
     document.addEventListener("DOMContentLoaded", function(event) {
-        callback();
+        arg[0]();
     });
 }
 
-//local storage
+//get, set or remove localStorage
+//arguments: name , value //empty string to remove
+//----------string---any------------
 window.EasyScript.storage = function() {
-    if (arguments.length > 1 && arguments[1] !== '') {
-        window.localStorage.setItem(arguments[0], JSON.stringify(arguments[1]));
-    } else if (arguments.length > 1 && arguments[1] === '') {
-        window.localStorage.removeItem(arguments[0]);
+    var arg=arguments;
+    if (arg.length > 1 && arg[1] !== '') {
+        window.localStorage.setItem(arg[0], JSON.stringify(arg[1]));
+    } else if (arg.length > 1 && arg[1] === '') {
+        window.localStorage.removeItem(arg[0]);
     } else {
-        if (window.localStorage.getItem(arguments[0]) !== null) {
-            return JSON.parse(window.localStorage.getItem(arguments[0]));
+        if (window.localStorage.getItem(arg[0]) !== null) {
+            return JSON.parse(window.localStorage.getItem(arg[0]));
         } else {
             return null;
         }
     }
 }
+
+//throw error
+//arguments: text
+//-----------string------------
+window.EasyScript.throwError = function() {
+    var arg=arguments;
+    console.error(arg[0]);
+};
 
 //definition of EasyScript
 window.E = E = EasyScript = window.EasyScript;
@@ -204,6 +427,5 @@ window.E = E = EasyScript = window.EasyScript;
 //-------------------------------------------------------
 //test
 E.ready(function () {
-    E('.amin').addClass('amin brave creative creative amin');
-    //console.log(E('.amin').closest('.bahar'));
+    console.log(E('.bahar').nextAll('div'));
 });
