@@ -1,4 +1,4 @@
-//version 0.2.0
+//version 0.3.0
 
 
 window.EasyScript = function(selector) {
@@ -52,6 +52,22 @@ window.EasyScript = function(selector) {
             }
         });
         return this;
+    }
+
+    //get or set attribute
+    //arguments: attributeName , value
+    //--------------string-------string-----------
+    function attr() {
+        var arg = arguments;
+        if (arg.length > 1) {
+            Array.prototype.forEach.call(elems, function (elem, index) {
+                elem[arg[0]] = arg[1];
+            });
+        }
+        else {
+            var elem = elems[0];
+            return elem.attributes[arg[0]].nodeValue;
+        }
     }
     
     //get the closest ancestor with the given query
@@ -164,13 +180,18 @@ window.EasyScript = function(selector) {
     //------------string---------------
     function parent() {  
         var arg=arguments,
-            elem=elems[0];
-        var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
-        if(matchesSelector.call(elem,arg[0])){
-            return window.EasyScript(elem.parentNode);
+            elem = elems[0];
+        if(arg.length>0){
+            var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
+            if(matchesSelector.call(elem,arg[0])){
+                return window.EasyScript(elem.parentNode);
+            }
+            else{
+                return false;
+            }
         }
-        else{
-            return false;
+        else {
+            return window.EasyScript(elem.parentNode);
         }
     }
 
@@ -324,41 +345,22 @@ window.EasyScript = function(selector) {
     //arguments: value
     //-----------string--------------------
     function val() {
-        var arg=arguments;
-        if(elems.length>1){
-            if(arg.length>0){
-                Array.prototype.forEach.call(elems, function (elem, index) {
-                    elem.value=arg[0];
-                });
-                return this;
-            }
-            else{
-                var output=[];
-                Array.prototype.forEach.call(elems, function (elem, index) {
-                    output.push({
-                        element:window.EasyScript(elem),
-                        value:elem.value
-                    });
-                });
-                return output;
-            }
+        var arg=arguments,
+            elem=elems[0];
+        if(arg.length>0){
+            elem.value=arg[0];
+            return this;
         }
         else{
-            elem=elems[0];
-            if(arg.length>0){
-                elem.value=arg[0];
-                return this;
-            }
-            else{
-                return elem.value;
-            }
+            return elem.value;
         }
     }
 
     //return the functions
     return {
         addClass: addClass,
-        append:append,
+        append: append,
+        attr:attr,
         closest:closest,
         each:each,
         jsObject:elems,
@@ -427,5 +429,5 @@ window.E = E = EasyScript = window.EasyScript;
 //-------------------------------------------------------
 //test
 E.ready(function () {
-    console.log(E('.bahar').nextAll('div'));
+    console.log(E('div'));
 });
