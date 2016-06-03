@@ -318,6 +318,11 @@ window.EasyScript = function(selector) {
             });
         } else {
             var elem = elems[0];
+            try {
+                JSON.parse(elem.getAttribute('data-'+arg[0]));
+            } catch (e) {
+                return elem.getAttribute('data-'+arg[0]);
+            }
             return JSON.parse(elem.getAttribute('data-'+arg[0]));
         }
         return this;
@@ -332,6 +337,14 @@ window.EasyScript = function(selector) {
             arg[0].apply(elem, [elem, index]);
         });
     }
+    
+    //find the selector descendent to the selected element
+    //arguments: selector
+    //-----------selector----------------
+    function find(){
+        var arg=arguments;
+        return E(elems[0].querySelector(arg[0]));
+    } 
     
     //check if element has the selected element
     //arguments: selector
@@ -494,10 +507,23 @@ window.EasyScript = function(selector) {
                     if (req.readyState == req.DONE) {
                         var response = req.responseText;
                         if (req.status == 200) {
-                            if(typeof arg[1]!=='undefined'){
-                                arg[1]();
-                            }
                             elem.innerHTML=response;
+                            var src=E(elem).js[0].querySelector('script').getAttribute('src');
+                            E(elem).js[0].querySelector('script').parentNode.removeChild(E(elem).js[0].querySelector('script'));
+                            var script = document.createElement('script');
+                            script.type = 'text/javascript';
+                            script.src = src;
+                            script.onreadystatechange = function(){
+                                if(typeof arg[1]!=='undefined'){
+                                    arg[1]();
+                                }
+                            };
+                            script.onload = function(){
+                                if(typeof arg[1]!=='undefined'){
+                                    arg[1]();
+                                }
+                            };
+                            elem.appendChild(script);
                         } else if (req.status == 400) {
                             window.EasyScript.throwError('Something went wrong!');
                         }
@@ -697,11 +723,11 @@ window.EasyScript = function(selector) {
                     handler:function(event) {
                         var target = window.EasyScript(event.target).closest(arg[1]);
                         if (target === null) return false;
-                        arg[2].call(document.querySelector(arg[1]), event);
+                        arg[2].call(target.js[0], event);
                     },
                     attachedTo:arg[1]
                 });
-                elem.addEventListener(arg[0], elem.handlers[elem.handlers.length-1].handler);
+                elem.addEventListener(arg[0], elem.handlers[elem.handlers.length-1].handler,true);
             });
         }
         return this;
@@ -1063,8 +1089,8 @@ window.EasyScript = function(selector) {
         removeClass: removeClass,
         replaceClass: replaceClass,
         scroll: scroll,
-        scrollHeight: elems[0].scrollHeight,
-        scrollWidth: elems[0].scrollWidth,
+        scrollHeight: (elems.length>0) ? elems[0].scrollHeight : undefined,
+        scrollWidth: (elems.length>0) ? elems[0].scrollWidth : undefined,
         show: show,
         siblings: siblings,
         text: text,
@@ -1150,8 +1176,8 @@ window.EasyScript.ajax = function() {
 }
 
 //set, get and remove cookies
-//arguments: none
-//---------------------------------
+//arguments: name , data , daysToExpire 
+//----------string--any-------number----------
 window.EasyScript.cookie=function(){
     var arg=arguments;
     if(arg.length > 1){
@@ -1180,7 +1206,14 @@ window.EasyScript.cookie=function(){
 //-------------array,object----function----------
 window.EasyScript.each = function() {
     var arg = arguments;
-    arg[0].forEach(arg[1]);
+    if(Object.prototype.toString.call(arg[0]) === '[object Array]'){
+        arg[0].forEach(arg[1]);
+    }
+    else if(typeof arg[0]==='object'){
+        for(key in arg[0]){
+            arg[1].apply(arg[0][key], [key, arg[0][key]]);
+        }
+    }
 };
 
 //escape string
@@ -1208,8 +1241,13 @@ window.EasyScript.escapeString = function() {
 window.EasyScript.ready = function() {
     var arg = arguments;
     document.addEventListener("DOMContentLoaded", function(event) {
+        window.EasyScript.ready.fired=true;
         arg[0]();
+        return;
     });
+    if(window.EasyScript.ready.fired){
+        arg[0]();
+    }
 }
 
 //replace all occurances
@@ -1232,8 +1270,8 @@ window.EasyScript.replaceAll=function(){
 window.EasyScript.state={
     push:function(){
         var arg=arguments,
-            link=arg[0] || window.location.pathname;
-        window.history.pushState({"content":E(E.state.elem).html()},'', link);
+            link=((arg[0]==='') ? '/' : arg[0]) || window.location.pathname;
+        window.history.pushState({"content":E(E.state.elem).html()},'',link);
     },
     watch:function(){
         var arg=arguments;
@@ -1241,6 +1279,13 @@ window.EasyScript.state={
         window.onpopstate = function(e){
             if(e.state){
                 E(arg[0]).html(e.state.content);
+                var elem=arg[0];
+                var src=E(elem).js[0].querySelector('script').getAttribute('src');
+                E(elem).js[0].querySelector('script').parentNode.removeChild(E(elem).js[0].querySelector('script'));
+                var script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = src;
+                E(elem).js[0].appendChild(script);
             }
         };
     },
