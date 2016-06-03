@@ -477,12 +477,12 @@ window.EasyScript = function(selector) {
     }
     
     //check if the element is loaded or load data into the element
-    //arguments: callback or url
-    //-----------function---string--------------
+    //arguments: callback or url , callback
+    //-----------function--string--function-----
     function load(){
         var arg=arguments,
             elem=elems[0];
-        if(arg.length===1){
+        if(arg.length>0){
             if(typeof arg[0]==='function'){
                 elem.onload=arg[0];
             }
@@ -494,6 +494,9 @@ window.EasyScript = function(selector) {
                     if (req.readyState == req.DONE) {
                         var response = req.responseText;
                         if (req.status == 200) {
+                            if(typeof arg[1]!=='undefined'){
+                                arg[1]();
+                            }
                             elem.innerHTML=response;
                         } else if (req.status == 400) {
                             window.EasyScript.throwError('Something went wrong!');
@@ -1146,6 +1149,32 @@ window.EasyScript.ajax = function() {
     }
 }
 
+//set, get and remove cookies
+//arguments: none
+//---------------------------------
+window.EasyScript.cookie=function(){
+    var arg=arguments;
+    if(arg.length > 1){
+        var expires = "";
+        if (arg[2]) {
+            var date = new Date();
+            date.setTime(date.getTime()+(arg[2]*24*60*60*1000));
+            var expires = "; expires="+date.toGMTString();
+        }
+        document.cookie = arg[0]+"="+JSON.stringify(arg[1])+expires+"; path=/";
+    }
+    else if(arg.length===1){
+        var nameEQ = arg[0] + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return JSON.parse(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+    }
+}
+
 //iterate over array or object
 //arguments: currentInstance , callback(value,index)
 //-------------array,object----function----------
@@ -1173,25 +1202,6 @@ window.EasyScript.escapeString = function() {
     });
 };
 
-//unescape string
-//arguments: string
-//-----------string------------
-window.EasyScript.unescapeString = function() {
-    var arg = arguments;
-    var entityMap = {
-        "&amp;": "&",
-        "&lt;": "<",
-        "&gt;": ">",
-        '&quot;': '"',
-        '&#39;': "'",
-        '&#x2F;': "/",
-        '&#x5C;': "\\"
-    };
-    return String(arg[0]).replace(/&amp;|&lt;|&gt;|&quot;|&#39;|&#x2F;|&#x5C;/gi, function(s) {
-        return entityMap[s];
-    });
-};
-
 //document ready
 //arguments: callback
 //-----------function-------------
@@ -1215,6 +1225,27 @@ window.EasyScript.replaceAll=function(){
         return undefined;
     }
 } 
+
+//push state
+//arguments: multiple scenarios
+//-----------------------------------
+window.EasyScript.state={
+    push:function(){
+        var arg=arguments,
+            link=arg[0] || window.location.pathname;
+        window.history.pushState({"content":E(E.state.elem).html()},'', link);
+    },
+    watch:function(){
+        var arg=arguments;
+        E.state.elem=arg[0];
+        window.onpopstate = function(e){
+            if(e.state){
+                E(arg[0]).html(e.state.content);
+            }
+        };
+    },
+    elem:''
+}
 
 //get, set or remove localStorage
 //arguments: name , value //empty string to remove
@@ -1252,11 +1283,24 @@ window.EasyScript.trim = function() {
 
 }
 
+//unescape string
+//arguments: string
+//-----------string------------
+window.EasyScript.unescapeString = function() {
+    var arg = arguments;
+    var entityMap = {
+        "&amp;": "&",
+        "&lt;": "<",
+        "&gt;": ">",
+        '&quot;': '"',
+        '&#39;': "'",
+        '&#x2F;': "/",
+        '&#x5C;': "\\"
+    };
+    return String(arg[0]).replace(/&amp;|&lt;|&gt;|&quot;|&#39;|&#x2F;|&#x5C;/gi, function(s) {
+        return entityMap[s];
+    });
+};
+
 //definition of EasyScript
 window.E = E = EasyScript = window.EasyScript;
-
-//-------------------------------------------------------
-//test
-E.ready(function() {
-    
-});
