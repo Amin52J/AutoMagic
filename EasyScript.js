@@ -1,4 +1,4 @@
-//version 0.6.0
+//version 0.7.0
 
 
 window.EasyScript = function(selector) {
@@ -338,6 +338,19 @@ window.EasyScript = function(selector) {
         });
     }
     
+    //select the given index in the selector
+    //arguments: index
+    //-----------number------------
+    function eq(){
+        var arg=arguments;
+        if(arg.length===0){
+            return undefined;
+        }
+        else{
+            return E(elems[arg[0]]);
+        }
+    }
+    
     //find the selector descendent to the selected element
     //arguments: selector
     //-----------selector----------------
@@ -423,6 +436,21 @@ window.EasyScript = function(selector) {
             elem.innerHTML = arg[0];
             return this;
         }
+    }
+    
+    //to get the index of the selected element in the parent
+    //arguments: none
+    //-------------------------------
+    function index(){
+        if(elems.length===0) return -1;
+        var node=elems[0],
+            children = node.parentNode.childNodes,
+            num = 0;
+        for (var i=0; i < children.length; i++) {
+            if (children[i]===node) return num;
+            if (children[i].nodeType===1) num++;
+        }
+        return -1;
     }
     
     //insert string at the carret position
@@ -583,6 +611,26 @@ window.EasyScript = function(selector) {
         } else {
             return window.EasyScript(output);
         }
+    }
+    
+    //exclude the selector from the selected set of elements
+    //arguments: selector
+    //------------string--------------
+    function not(){
+        var arg=arguments,
+            output=[];
+        Array.prototype.forEach.call(elems,function(elem,index){
+            var isNot=true;
+            Array.prototype.forEach.call(E(arg[0]).js,function(notElem,index){
+                if(elem===notElem){
+                    isNot=false;
+                }
+            });
+            if(isNot){
+                output.push(elem);
+            }
+        });
+        return E(output);
     }
 
     //remove event listener
@@ -1066,11 +1114,13 @@ window.EasyScript = function(selector) {
         css:css,
         data:data,
         each: each,
+        eq:eq,
         has:has,
         hasClass:hasClass,
         height: height,
         hide: hide,
         html: html,
+        index:index,
         insertAtCaret:insertAtCaret,
         is:is,
         js: elems,
@@ -1078,6 +1128,7 @@ window.EasyScript = function(selector) {
         load:load,
         next: next,
         nextAll: nextAll,
+        not:not,
         off: off,
         offset: offset,
         on: on,
