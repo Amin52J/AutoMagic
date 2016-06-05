@@ -1,4 +1,4 @@
-//version 0.7.0
+//version 0.7.1
 
 
 window.EasyScript = function(selector) {
@@ -1330,13 +1330,19 @@ window.EasyScript.state={
         window.onpopstate = function(e){
             if(e.state){
                 E(arg[0]).html(e.state.content);
-                var elem=arg[0];
-                var src=E(elem).js[0].querySelector('script').getAttribute('src');
-                E(elem).js[0].querySelector('script').parentNode.removeChild(E(elem).js[0].querySelector('script'));
-                var script = document.createElement('script');
-                script.type = 'text/javascript';
-                script.src = src;
-                E(elem).js[0].appendChild(script);
+                var elem=arg[0],
+                    count=0;
+                Array.prototype.forEach.call(E(elem).js[0].querySelectorAll('script'),function(file,index){
+                    count++;
+                });
+                for(var i=0; i < count; i++){
+                    var src=E(elem).js[0].querySelectorAll('script')[i].getAttribute('src');
+                    E(elem).js[0].querySelectorAll('script')[i].parentNode.removeChild(E(elem).js[0].querySelectorAll('script')[i]);
+                    var script = document.createElement('script');
+                    script.type = 'text/javascript';
+                    script.src = src;
+                    E(elem).js[0].appendChild(script);
+                }
             }
         };
     },
