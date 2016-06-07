@@ -1313,7 +1313,71 @@ window.EasyScript.replaceAll=function(){
         window.EasyScript.throwError('SyntaxError: three arguments required');
         return undefined;
     }
-} 
+}
+
+//two-way data binding
+//arguments: scopeName , value
+//------------string-----string------------
+//window.EasyScript.scope = function () {
+//    var arg = arguments,
+//        scope = window.EasyScript.scope.rawScope || E('.scope').html(),
+//        regex = new RegExp("{{(.*)}}", 'g'),
+//        keys = scope.match(regex).map(function (val) {
+//            return val.replace(/{/g, '').replace(/}/g, '');
+//        });
+
+//    if (typeof window.EasyScript.scope.rawScope === 'undefined') {
+//        Array.prototype.forEach.call(E('[e-listen]').js, function (elem, index) {
+//            E(document).on(E(elem).attr('e-listen').split(',')[0], elem, function () {
+//                E.scope[E(this).attr('e-listen').split(',')[1]] = E(this).val();
+//                console.log(E.scope[E(this).attr('e-listen').split(',')[1]]);
+//            })
+//        });
+//    }
+//    window.EasyScript.scope.rawScope = scope;
+
+//    keys.forEach(function (val) {
+//        scope=scope.replace('{{'+val+'}}',(E.scope[val] || ''));
+//    });
+//    E('.scope').html(scope);
+//};
+
+
+//two-way data binding
+//arguments: scopeName , value
+//------------string-----string------------
+window.EasyScript.scope = function () {
+    var regex = new RegExp("{{(.*)}}", 'g'),
+        scope = '';
+    E.scope.keys=[];
+    E('.scope *').each(function (elem, index) {
+        if (!elem.scope) {
+            for (key in E(elem).js[0].attributes) {
+                scope = E(elem).js[0].attributes[key].nodeValue;
+                if(scope!==undefined){
+                    if (scope.indexOf('{{') > -1) {
+                        E.scope.keys.push({
+                            elem: elem,
+                            keys: {
+                                key:[],
+                                value:[]
+                            },
+                            place: E(elem).js[0].attributes[key].nodeName
+                        });
+                        var elemKeys = scope.match(regex).map(function (val) {
+                            return val.replace(/{/g, '').replace(/}/g, '');
+                        });
+                        elemKeys.forEach(function (v, i) {
+                            E.scope.keys[E.scope.keys.length - 1].keys.value.push(E.scope[v]);
+                        });
+                        E.scope.keys[E.scope.keys.length - 1].keys.key = elemKeys;
+                    }
+                }
+            }
+        }
+    });
+    console.log(E.scope.keys);
+}
 
 //push state
 //arguments: multiple scenarios
@@ -1406,3 +1470,10 @@ window.EasyScript.unescapeString = function() {
 
 //definition of EasyScript
 window.E = E = EasyScript = window.EasyScript;
+
+
+E.ready(function () {
+    E.scope.amin = 'hello world';
+    E.scope.active = 'activated';
+    E.scope();
+});
