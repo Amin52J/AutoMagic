@@ -1325,7 +1325,6 @@ window.EasyScript.replaceAll=function(){
 //        keys = scope.match(regex).map(function (val) {
 //            return val.replace(/{/g, '').replace(/}/g, '');
 //        });
-
 //    if (typeof window.EasyScript.scope.rawScope === 'undefined') {
 //        Array.prototype.forEach.call(E('[e-listen]').js, function (elem, index) {
 //            E(document).on(E(elem).attr('e-listen').split(',')[0], elem, function () {
@@ -1335,13 +1334,11 @@ window.EasyScript.replaceAll=function(){
 //        });
 //    }
 //    window.EasyScript.scope.rawScope = scope;
-
 //    keys.forEach(function (val) {
 //        scope=scope.replace('{{'+val+'}}',(E.scope[val] || ''));
 //    });
 //    E('.scope').html(scope);
 //};
-
 
 //two-way data binding
 //arguments: scopeName , value
@@ -1352,13 +1349,13 @@ window.EasyScript.scope = function () {
     E.scope.keys=[];
     E('.scope *').each(function (elem, index) {
         if (!elem.scope) {
+            elem.scope = [];
             for (key in E(elem).js[0].attributes) {
                 scope = E(elem).js[0].attributes[key].nodeValue;
                 if(scope!==undefined){
                     if (scope.indexOf('{{') > -1) {
-                        E.scope.keys.push({
-                            elem: elem,
-                            keys: {
+                        elem.scope.push({
+                            scopes: {
                                 key:[],
                                 value:[]
                             },
@@ -1368,16 +1365,75 @@ window.EasyScript.scope = function () {
                             return val.replace(/{/g, '').replace(/}/g, '');
                         });
                         elemKeys.forEach(function (v, i) {
-                            E.scope.keys[E.scope.keys.length - 1].keys.value.push(E.scope[v]);
+                            elem.scope[elem.scope.length - 1].scopes.value.push(E.scope[v]);
+                            var event = new Event(v+'Changed');
                         });
-                        E.scope.keys[E.scope.keys.length - 1].keys.key = elemKeys;
+                        elem.scope[elem.scope.length - 1].scopes.key = elemKeys;
+                        elem.scope.forEach(function (v, i) {
+                            if (v.place === 'value') {
+                                E(elem).val(E.scope[elem.scope[i].scopes.key[0]]);
+                                E(elem).on('input', function () {
+                                });
+                                E(elem).on(event, function () {
+                                    E.scope[elem.scope[i].scopes.key[0]] = E(this).val();
+                                });
+                            }
+                        });
+                    }
+                }
+                else {
+                    scope = E(elem).js[0].innerHTML;
+                    if (scope.indexOf('{{') > -1) {
+                        elem.scope.push({
+                            scopes: {
+                                key: [],
+                                value: []
+                            },
+                            place: 'html'
+                        });
+                        var elemKeys = scope.match(regex).map(function (val) {
+                            return val.replace(/{/g, '').replace(/}/g, '');
+                        });
+                        elemKeys.forEach(function (v, i) {
+                            elem.scope[elem.scope.length - 1].scopes.value.push(E.scope[v]);
+                        });
+                        elem.scope[elem.scope.length - 1].scopes.key = elemKeys;
+                        elem.scope.forEach(function (v, i) {
+                            if (v.place === 'html') {
+                                E(elem).html(E.scope[elem.scope[i].scopes.key[0]]);
+                                E(elem).on('input', function () {
+                                    E.scope[elem.scope[i].scopes.key[0]] = E(this).val();
+                                    console.log(E.scope[elem.scope[i].scopes.key[0]]);
+                                });
+                            }
+                        });
                     }
                 }
             }
         }
+        console.log(elem.scope);
     });
-    console.log(E.scope.keys);
 }
+
+//two-way data binding
+//arguments: scopeName , value
+//------------string-----string------------
+//window.EasyScript.scope = function () {
+//    var scopes = [];
+//    for (scope in E.scope) {
+//        scopes.push(scope);
+//    }
+//    E('.scope *').each(function (elem, index) {
+//        elem.childNodes.forEach(function (node, nodeIndex) {
+//            if (node.nodeName === '#text') {
+//                scopes.forEach(function (scopeName, scopeIndex) {
+//                    if (node.nodeValue === scopeName) {
+//                    }
+//                });
+//            }
+//        });
+//    });
+//}
 
 //push state
 //arguments: multiple scenarios
@@ -1474,6 +1530,12 @@ window.E = E = EasyScript = window.EasyScript;
 
 E.ready(function () {
     E.scope.amin = 'hello world';
-    E.scope.active = 'activated';
+    E.scope.active = {
+        a: {
+            b:{
+                c:'hello'
+            }
+        }
+    }
     E.scope();
 });
