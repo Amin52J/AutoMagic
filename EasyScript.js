@@ -1413,7 +1413,7 @@ window.E = E = EasyScript = window.EasyScript;
 window.EasyScript.scopeRenderedObjects=[];
 window.EasyScript.scope=function(){
     var arg=arguments;
-    var scope=E('.scope').length===0 ? E('body [data-bind]') : E('.scope [data-bind]');
+    var scope=document.querySelectorAll('.scope').length===0 ? document.body.querySelectorAll('[data-bind]') : document.querySelector('.scope').querySelectorAll('[data-bind]');
                                         
     //set the new value to the bound scope
     function set(obj, path, value) {
@@ -1423,32 +1423,30 @@ window.EasyScript.scope=function(){
             return o[k];
         }, obj)[last] = value;
     }
-    scope.each(function(elem,index){
-        //if data-bind is added to the element
-            
+    Array.prototype.forEach.call(scope,function(elem,index){
         //get the seperated bindings
-        var binding=E(this).data('bind').replace(/{/g,'').split('}');
+        var binding=elem.getAttribute('data-bind').replace(/{/g,'').split('}');
         binding.splice(binding.length-1,1);
         
         //activate all bindings
-        E.each(binding,function(v,i){
+        binding.forEach(function(v,i){
             //get the key and the event that it is bound to
             var key=v.split(',')[0].split('.').join(''),
                 event=v.split(',')[1];
             if(event==='class'){
                 var splittedKey=key.split('?'),
-                    trueClass=E.trim(splittedKey[1].split(':')[0]).replace(/"/g,'').replace(/'/g,''),
-                    falseClass=E.trim(splittedKey[1].split(':')[1]).replace(/"/g,'').replace(/'/g,'');
-                if(E.trim(splittedKey[0]).indexOf('!')===0){
+                    trueClass=splittedKey[1].split(':')[0].trim().replace(/"/g,'').replace(/'/g,''),
+                    falseClass=splittedKey[1].split(':')[1].trim().replace(/"/g,'').replace(/'/g,'');
+                if(splittedKey[0].trim().indexOf('!')===0){
                     [trueClass,falseClass]=[falseClass,trueClass];
                 }
-                key=E.trim(splittedKey[0]).replace('!','');
+                key=splittedKey[0].trim().replace('!','');
                 if(key===arg[0].split('.').join('')){
                     if(!elem[key+'ClassChanged']){
                         var ev=new Event(key+'ClassChanged');
-                        E(elem).data(key+'ClassChanged',true);
+                        elem.setAttribute('data-'+key+'ClassChanged',true);
                         elem[key+'ClassChanged']=ev;
-                        E(elem).on(ev,function(){
+                        elem.addEventListener(ev,function(){
                             if(key.indexOf('.') > -1){
                                 var subKeys=key.split('.'),
                                     subValue=E.scope[key];
@@ -1460,22 +1458,22 @@ window.EasyScript.scope=function(){
                                 var subValue=E.scope[key];
                             }
                             if(subValue){
-                                if(E.trim(falseClass)!==''){
+                                if(falseClass.trim()!==''){
                                     E(elem).removeClass(falseClass);
                                 }
-                                if(E.trim(trueClass)!==''){
+                                if(trueClass.trim()!==''){
                                     E(elem).addClass(trueClass);
                                 }
                             }
                             else{
-                                if(E.trim(falseClass)!==''){
+                                if(falseClass.trim()!==''){
                                     E(elem).addClass(falseClass);
                                 }
-                                if(E.trim(trueClass)!==''){
+                                if(trueClass.trim()!==''){
                                     E(elem).removeClass(trueClass);
                                 }
                             }
-                        });
+                        },false);
                     }
                     if(key.indexOf('.') > -1){
                         var subKeys=key.split('.'),
@@ -1488,9 +1486,28 @@ window.EasyScript.scope=function(){
                     else{
                         E.scope[key]=arg[1];
                     }
-                    E('[data-'+key+'ClassChanged]').each(function(){
-                        E(this).trigger(this[key+'ClassChanged']);
+                    Array.prototype.forEach.call(document.querySelectorAll('[data-'+key+'ClassChanged]'),function(telem,tindex){
+                        var tevent;
+                        tevent = document.createEvent("HTMLEvents");
+                        tevent.initEvent(telem[key+'ClassChanged'], true, true);
+
+                        tevent.eventName = telem[key+'ClassChanged'];
+                        telem.dispatchEvent(tevent);
                     });
+                }
+                else if(typeof arg[1]==='object' && v.split(',')[0].split('.')[0]===arg[0].split('.')[0]){
+                    function iterateOnObjectClass(obj){
+                        for(key in obj){
+                            if(typeof obj[key]==='object'){
+                                iterateOnObjectClass(obj[key]);
+                            }
+                            else if(v.split('?')[0].trim().split('.')[v.split('?')[0].trim().split('.').length-1]===key && E.scopeRenderedObjects.indexOf(key) < 0){
+                                E.scopeRenderedObjects.push(key);
+                                E.scope(v.split('?')[0].trim(),obj[key]);
+                            }
+                        }
+                    }
+                    iterateOnObjectClass(arg[1]);
                 }
             }
             //if the key roots are the same
@@ -1509,9 +1526,9 @@ window.EasyScript.scope=function(){
                 if(!elem[key+'Changed']){
                     //bind the event to the element
                     var ev=new Event(key+'Changed');
-                    E(elem).data(key+'Changed',true);
+                    elem.setAttribute('data-'+key+'Changed',true);
                     elem[key+'Changed']=ev;
-                    E(elem).on(ev,function(){
+                    elem.addEventListener(ev,function(){
                         if(argObject //it means if the value given is an object 
                             && oldKey.indexOf('.') > -1 //and the key is a route to the sub variable of an object
                             ){
@@ -1551,7 +1568,7 @@ window.EasyScript.scope=function(){
                     
                     if(event==='value' || event==='checked'){
                         if(elem.type==='email' || elem.type==='number' || elem.type==='password' || elem.type==='search' || elem.type==='tel' || elem.type==='text' || elem.type==='url' || elem.type==='textarea'){
-                            E(elem).on('input',function(){
+                            elem.addEventListener('input',function(){
                                 if(typeof oldKey!=='undefined' //which means if the given value is an object 
                                     && oldKey.indexOf('.') > -1){ //and the given key is a route to the sub variable of an object
                                     set(E.scope[key], oldKey.replace(key+'.',''), E(elem).val());
@@ -1559,13 +1576,18 @@ window.EasyScript.scope=function(){
                                 else{ //if the given value is not an object and the key is not a route to the sub variable of an object
                                     E.scope[key]=E(elem).val();
                                 }
-                                E('[data-'+key+'Changed]').each(function(){
-                                    E(this).trigger(ev);
+                                Array.prototype.forEach.call(document.querySelectorAll('[data-'+key+'Changed]'),function(telem,tindex){
+                                    var tevent;
+                                    tevent = document.createEvent("HTMLEvents");
+                                    tevent.initEvent(telem[key+'Changed'], true, true);
+
+                                    tevent.eventName = telem[key+'Changed'];
+                                    telem.dispatchEvent(tevent);
                                 });
-                            });
+                            },true);
                         }
                         else{
-                            E(elem).on('change',function(){
+                            elem.addEventListener('change',function(){
                                 if(typeof oldKey!=='undefined' //which means if the given value is an object 
                                     && oldKey.indexOf('.') > -1){ //and the given key is a route to the sub variable of an object
                                     if(event==='checked' || event==='disabled'){
@@ -1583,10 +1605,15 @@ window.EasyScript.scope=function(){
                                         E.scope[key]=E(elem).val();
                                     }
                                 }
-                                E('[data-'+key+'Changed]').each(function(){
-                                    E(this).trigger(ev);
+                                Array.prototype.forEach.call(document.querySelectorAll('[data-'+key+'Changed]'),function(telem,tindex){
+                                    var tevent;
+                                    tevent = document.createEvent("HTMLEvents");
+                                    tevent.initEvent(telem[key+'Changed'], true, true);
+
+                                    tevent.eventName = telem[key+'Changed'];
+                                    telem.dispatchEvent(tevent);
                                 });
-                            });
+                            },true);
                         }
                     }
                 }
@@ -1596,8 +1623,13 @@ window.EasyScript.scope=function(){
                 else{
                     E.scope[key]=arg[1];
                 }
-                E('[data-'+key+'Changed]').each(function(){
-                    E(this).trigger(this[key+'Changed']);
+                Array.prototype.forEach.call(document.querySelectorAll('[data-'+key+'Changed]'),function(telem,tindex){
+                    var tevent;
+                    tevent = document.createEvent("HTMLEvents");
+                    tevent.initEvent(telem[key+'Changed'], true, true);
+
+                    tevent.eventName = telem[key+'Changed'];
+                    telem.dispatchEvent(tevent);
                 });
             }
             else if(typeof arg[1]==='object' && v.split(',')[0].split('.')[0]===arg[0].split('.')[0]){
@@ -1606,8 +1638,8 @@ window.EasyScript.scope=function(){
                         if(typeof obj[key]==='object'){
                             iterateOnObject(obj[key]);
                         }
-                        else if(v.split(',')[0].split('.')[v.split(',')[0].split('.').length-1]===key && E.scopeRenderedObjects.indexOf(obj[key]) < 0){
-                            E.scopeRenderedObjects.push(obj[key]);
+                        else if(v.split(',')[0].split('.')[v.split(',')[0].split('.').length-1]===key && E.scopeRenderedObjects.indexOf(key) < 0){
+                            E.scopeRenderedObjects.push(key);
                             E.scope(v.split(',')[0],obj[key]);
                         }
                     }
@@ -1632,4 +1664,9 @@ E.ready(function () {
         image:'http://images.all-free-download.com/images/graphiclarge/daisy_pollen_flower_220533.jpg'
     });
     console.timeEnd('Scope');
+    setTimeout(function() {
+        console.time('ScopeChange');
+        E.scope('amin.active',true);
+        console.timeEnd('ScopeChange');
+    }, 5000);
 });
