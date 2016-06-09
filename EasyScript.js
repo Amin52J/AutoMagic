@@ -1423,6 +1423,65 @@ window.EasyScript.scope=function(){
             return o[k];
         }, obj)[last] = value;
     }
+    function prop() {
+        var arg = arguments,
+            elem=arg[2]||arg[1];
+        if (arg.length > 2) {
+            elem[arg[0]] = arg[1];
+        } else if (arg.length === 2) {
+            return elem[arg[0]];
+        }
+    }
+    function removeClass() {
+        var arg = arguments;
+        var elem=arg[1];
+        var classArray = arg[0].split(' ');
+        classArray.forEach(function(currentClass, index) {
+            var classes=elem.className.split(' ');
+            classes.forEach(function(value) {
+                if(value===currentClass){
+                    elem.className = elem.className.replace(currentClass, '');
+                }
+            });
+        });
+    }
+    function addClass() {
+        var arg = arguments;
+        var elem=arg[1];
+        var classArray = arg[0].split(' ');
+        classArray.forEach(function(currentClass, index) {
+            if (elem.className.indexOf(currentClass) < 0) {
+                elem.className += ' ' + currentClass;
+            }
+        });
+    }
+    function val() {
+        var arg = arguments,
+            elem = arg[1] || arg[0];
+        if (arg.length > 1) {
+            elem.value = arg[0];
+        } else {
+            return elem.value;
+        }
+    }
+    function html() {
+        var arg = arguments,
+            elem = arg[1]||arg[0];
+        if (arg.length === 1) {
+            return elem.innerHTML;
+        } else {
+            elem.innerHTML = arg[0];
+        }
+    }
+    function attr() {
+        var arg = arguments,
+            elem=arg[2]||arg[1];
+        if (arg.length > 2) {
+            elem.setAttribute(arg[0],arg[1]);
+        } else {
+            return elem.getAttribute(arg[0]);
+        }
+    }
     Array.prototype.forEach.call(scope,function(elem,index){
         //get the seperated bindings
         var binding=elem.getAttribute('data-bind').replace(/{/g,'').split('}');
@@ -1459,18 +1518,18 @@ window.EasyScript.scope=function(){
                             }
                             if(subValue){
                                 if(falseClass.trim()!==''){
-                                    E(elem).removeClass(falseClass);
+                                    removeClass(falseClass,elem);
                                 }
                                 if(trueClass.trim()!==''){
-                                    E(elem).addClass(trueClass);
+                                    addClass(trueClass,elem);
                                 }
                             }
                             else{
                                 if(falseClass.trim()!==''){
-                                    E(elem).addClass(falseClass);
+                                    addClass(falseClass,elem);
                                 }
                                 if(trueClass.trim()!==''){
-                                    E(elem).removeClass(trueClass);
+                                    removeClass(trueClass,elem);
                                 }
                             }
                         },false);
@@ -1504,6 +1563,7 @@ window.EasyScript.scope=function(){
                             else if(v.split('?')[0].trim().split('.')[v.split('?')[0].trim().split('.').length-1]===key && E.scopeRenderedObjects.indexOf(key) < 0){
                                 E.scopeRenderedObjects.push(key);
                                 E.scope(v.split('?')[0].trim(),obj[key]);
+                                break;
                             }
                         }
                     }
@@ -1538,30 +1598,30 @@ window.EasyScript.scope=function(){
                                 subValue=subValue[subKeys[x]];
                             }
                             if(event==='value'){
-                                E(elem).val(subValue);
+                                val(subValue,elem);
                             }
                             else if(event==='html'){
-                                E(elem).html(subValue);
+                                html(subValue,elem);
                             }
                             else if(event==='checked' || event==='disabled'){
-                                E(elem).prop(event,subValue);
+                                prop(event,subValue,elem);
                             }
                             else if(event==='src'){
-                                E(elem).attr(event,subValue);
+                                attr(event,subValue,elem);
                             }
                         }
                         else{ //if the given value is not an object and the key is not a route to the sub variable of an object
                             if(event==='value'){
-                                E(elem).val(E.scope[key]);
+                                val(E.scope[key],elem);
                             }
                             else if(event==='html'){
-                                E(elem).html(E.scope[key]);
+                                html(E.scope[key],elem);
                             }
                             else if(event==='checked' || event==='disabled'){
-                                E(elem).prop(event,E.scope[key]);
+                                prop(event,E.scope[key],elem);
                             }
                             else if(event==='src'){
-                                E(elem).attr(event,E.scope[key]);
+                                attr(event,E.scope[key],elem);
                             }
                         }
                     });
@@ -1571,10 +1631,10 @@ window.EasyScript.scope=function(){
                             elem.addEventListener('input',function(){
                                 if(typeof oldKey!=='undefined' //which means if the given value is an object 
                                     && oldKey.indexOf('.') > -1){ //and the given key is a route to the sub variable of an object
-                                    set(E.scope[key], oldKey.replace(key+'.',''), E(elem).val());
+                                    set(E.scope[key], oldKey.replace(key+'.',''), val(elem));
                                 }
                                 else{ //if the given value is not an object and the key is not a route to the sub variable of an object
-                                    E.scope[key]=E(elem).val();
+                                    E.scope[key]=val(elem);
                                 }
                                 Array.prototype.forEach.call(document.querySelectorAll('[data-'+key+'Changed]'),function(telem,tindex){
                                     var tevent;
@@ -1591,18 +1651,18 @@ window.EasyScript.scope=function(){
                                 if(typeof oldKey!=='undefined' //which means if the given value is an object 
                                     && oldKey.indexOf('.') > -1){ //and the given key is a route to the sub variable of an object
                                     if(event==='checked' || event==='disabled'){
-                                        set(E.scope[key], oldKey.replace(key+'.',''), E(elem).prop(event));
+                                        set(E.scope[key], oldKey.replace(key+'.',''), prop(event,elem));
                                     }
                                     else{
-                                        set(E.scope[key], oldKey.replace(key+'.',''), E(elem).val());
+                                        set(E.scope[key], oldKey.replace(key+'.',''), val(elem));
                                     }
                                 }
                                 else{ //if the given value is not an object and the key is not a route to the sub variable of an object
                                     if(event==='checked' || event==='disabled'){
-                                        E.scope[key]=E(elem).prop(event);
+                                        E.scope[key]=prop(event,elem);
                                     }
                                     else{
-                                        E.scope[key]=E(elem).val();
+                                        E.scope[key]=val(elem);
                                     }
                                 }
                                 Array.prototype.forEach.call(document.querySelectorAll('[data-'+key+'Changed]'),function(telem,tindex){
@@ -1641,6 +1701,7 @@ window.EasyScript.scope=function(){
                         else if(v.split(',')[0].split('.')[v.split(',')[0].split('.').length-1]===key && E.scopeRenderedObjects.indexOf(key) < 0){
                             E.scopeRenderedObjects.push(key);
                             E.scope(v.split(',')[0],obj[key]);
+                            break;
                         }
                     }
                 }
@@ -1652,7 +1713,7 @@ window.EasyScript.scope=function(){
 
 
 E.ready(function () {
-    console.time('Scope');
+    var t0=performance.now();
     E.scope('amin',{
         a:{
             c:'Amin'
@@ -1663,10 +1724,12 @@ E.ready(function () {
         disabled:true,
         image:'http://images.all-free-download.com/images/graphiclarge/daisy_pollen_flower_220533.jpg'
     });
-    console.timeEnd('Scope');
+    var t1=performance.now();
+    console.log('Scope: '+(t1-t0));
     setTimeout(function() {
-        console.time('ScopeChange');
+        var t0=performance.now();
         E.scope('amin.active',true);
-        console.timeEnd('ScopeChange');
+        var t1=performance.now();
+        console.log('ScopeChange: '+(t1-t0));
     }, 5000);
 });
