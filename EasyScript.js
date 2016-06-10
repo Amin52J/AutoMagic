@@ -86,14 +86,16 @@ window.E = E = EasyScript = window.EasyScript=function(selector){
 window.EasyScriptConstructor.prototype.addClass=function(){
     var arg = arguments,
         elems=this.js;
-    Array.prototype.forEach.call(elems, function(elem, index) {
-        var classArray = arg[0].split(' ');
-        classArray.forEach(function(currentClass, index) {
+    for(var index=0, elemLength=elems.length; index < elemLength; index++){
+        var elem=elems[index],
+            classArray = arg[0].split(' ');
+        for(var ind=0, classLength=classArray.length; ind < classLength; ind++){
+            var currentClass=classArray[ind];
             if (elem.className.indexOf(currentClass) < 0) {
                 elem.className += ' ' + currentClass;
             }
-        });
-    });
+        };
+    };
     return this;
 }
 
@@ -108,25 +110,29 @@ window.EasyScriptConstructor.prototype.animate= function() {
     } else {
         if (typeof arg[1] === 'number') {
             var propArray = [];
-            vendors.forEach(function(vendor) {
+            for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+                var vendor=vendors[i];
                 propArray.push(toCamelCase(vendor + 'transition-duration'));
-            });
+            };
             var transitionDuration = getSupportedProp(propArray);
         }
         if (typeof arg[2] === 'string') {
             var propArray = [];
-            vendors.forEach(function(vendor) {
+            for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+                var vendor=vendors[i];
                 propArray.push(toCamelCase(vendor + 'transition-timing-function'));
-            });
+            };
             var transitionTimingFunction = getSupportedProp(propArray);
         }
         var propArray = [];
-        vendors.forEach(function(vendor) {
+        for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+            var vendor=vendors[i];
             propArray.push(toCamelCase(vendor + 'transition-property'));
-        });
+        };
         var transitionProperty = getSupportedProp(propArray);
 
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        for(var index=0, elemLength=elems.length; index < elemLength; index++){
+            var elem=elems[index];
             elem.style[transitionProperty] = '';
             var count = 0;
             for (key in arg[0]) {
@@ -177,16 +183,17 @@ window.EasyScriptConstructor.prototype.animate= function() {
             if (typeof arg[2] === 'string') {
                 elem.style[transitionTimingFunction] = arg[2];
             }
-        });
+        };
 
         var propArray = [],
             properties = [];
 
         for (key in arg[0]) {
             propArray = [];
-            vendors.forEach(function(vendor) {
+            for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+                var vendor=vendors[i];
                 propArray.push(toCamelCase(vendor + key));
-            });
+            };
             properties.push({
                 prop: getSupportedProp(propArray),
                 value: arg[0][key]
@@ -194,7 +201,8 @@ window.EasyScriptConstructor.prototype.animate= function() {
         }
 
         var that = this;
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        
+        elems.forEach(function(elem, index) {
             properties.forEach(function(property) {
                 var style = window.getComputedStyle(elem);
                 elem.style[property.prop] = style.getPropertyValue(property.prop);
@@ -220,7 +228,7 @@ window.EasyScriptConstructor.prototype.animate= function() {
 window.EasyScriptConstructor.prototype.append=function() {
     var arg = arguments,
         elems=this.js;
-    Array.prototype.forEach.call(elems, function(elem, index) {
+    elems.forEach(function(elem, index) {
         if (typeof arg[0] === 'string') {
             elem.innerHTML += arg[0];
         } else {
@@ -237,7 +245,7 @@ window.EasyScriptConstructor.prototype.attr=function() {
     var arg = arguments,
         elems=this.js;
     if (arg.length > 1) {
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             elem.setAttribute(arg[0],arg[1]);
         });
     } else {
@@ -278,14 +286,15 @@ window.EasyScriptConstructor.prototype.css=function () {
         var propArray = [],
         properties;
         propArray = [];
-        vendors.forEach(function(vendor) {
+        for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+            var vendor=vendors[i];
             propArray.push(toCamelCase(vendor + arg[0]));
-        });
+        };
         properties={
             prop: getSupportedProp(propArray),
             value: arg[1]
         };
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             var style = window.getComputedStyle(elem);
             elem.style[arg[0]] = style.getPropertyValue(properties.prop);
             setTimeout(function() {
@@ -299,16 +308,17 @@ window.EasyScriptConstructor.prototype.css=function () {
 
         for (key in arg[0]) {
             propArray = [];
-            vendors.forEach(function(vendor) {
+            for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+                var vendor=vendors[i];
                 propArray.push(toCamelCase(vendor + key));
-            });
+            };
             properties.push({
                 prop: getSupportedProp(propArray),
                 value: arg[0][key]
             });
         }
 
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             properties.forEach(function(property) {
                 var style = window.getComputedStyle(elem);
                 elem.style[property.prop] = style.getPropertyValue(property.prop);
@@ -328,7 +338,7 @@ window.EasyScriptConstructor.prototype.data=function (){
     var arg = arguments,
         elems=this.js;
     if (arg.length > 1) {
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             elem.setAttribute('data-'+arg[0],JSON.stringify(arg[1]));
         });
     } else {
@@ -349,7 +359,7 @@ window.EasyScriptConstructor.prototype.data=function (){
 window.EasyScriptConstructor.prototype.each=function () {
     var arg = arguments,
         elems=this.js;
-    Array.prototype.forEach.call(elems, function(elem, index) {
+    elems.forEach(function(elem, index) {
         arg[0].apply(elem, [elem, index]);
     });
 }
@@ -419,7 +429,7 @@ window.EasyScriptConstructor.prototype.height=function () {
     } else if (typeof arg[0] === 'boolean' && arg[0]===false) {
         return elems[0].clientHeight;
     } else if (typeof arg[0] === 'number') {
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             elem.style.height = arg[0] + 'px';
         });
         return this;
@@ -433,12 +443,12 @@ window.EasyScriptConstructor.prototype.hide=function () {
     var arg = arguments,
         elems=this.js;
     if (arg.length === 0) {
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             elem.style.display = 'none';
         });
     } else {
         setTimeout(function() {
-            Array.prototype.forEach.call(elems, function(elem, index) {
+            elems.forEach(function(elem, index) {
                 elem.style.display = 'none';
             });
         }, arg[0]);
@@ -644,9 +654,9 @@ window.EasyScriptConstructor.prototype.not=function (){
     var arg=arguments,
         output=[],
         elems=this.js;
-    Array.prototype.forEach.call(elems,function(elem,index){
+    elems.forEach(function(elem,index){
         var isNot=true;
-        Array.prototype.forEach.call(E(arg[0]).js,function(notElem,index){
+        E(arg[0]).js.forEach(function(notElem,index){
             if(elem===notElem){
                 isNot=false;
             }
@@ -665,28 +675,34 @@ window.EasyScriptConstructor.prototype.off=function () {
     var arg = arguments,
         elems=this.js;
     if(arg.length===0){
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             if(typeof elem.handlers!=='undefined'){
-                elem.handlers.forEach(function(obj,i){
+                //before change
+                // elem.handlers.forEach(function(obj,i){
+                for(var i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
+                    var obj=elem.handlers[i];
                     elem.removeEventListener(obj.event,obj.handler);
-                });
+                };
                 elem.handlers=[];
             }
         });
     }
     else if (arg.length ===1 && typeof arg[0]==='string') {
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             var handler=null;
             if(typeof elem.handlers==='undefined'){
                 E.throwError('The selected event is not attached.');
                 return undefined;
             }
-            elem.handlers.forEach(function(obj,i){
+            //before change
+            // elem.handlers.forEach(function(obj,i){
+            for(var i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
+                var obj=elem.handlers[i];
                 if(obj.event===arg[0]){
                     handler=obj.handler;
                     elem.handlers.splice(i,1);
                 }
-            });
+            };
             if(handler===null){
                 E.throwError('The selected event is not attached.');
                 return undefined;
@@ -694,14 +710,17 @@ window.EasyScriptConstructor.prototype.off=function () {
             elem.removeEventListener(arg[0],handler);
         });
     } else if (arg.length === 2 && typeof arg[0]==='string' && typeof arg[1]==='function') {
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             var foundHandler=false;
-            elem.handlers.forEach(function(obj,i){
+            //before change
+            // elem.handlers.forEach(function(obj,i){
+            for(var i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
+                var obj=elem.handlers[i];
                 if(obj.event===arg[0] && obj.handler.toString()===arg[1].toString()){
                     elem.handlers.splice(i,1);
                     foundHandler=true;
                 }
-            });
+            };
             if(foundHandler){
                 elem.removeEventListener(arg[0], arg[1]);
             }
@@ -711,16 +730,19 @@ window.EasyScriptConstructor.prototype.off=function () {
             }
         });
     } else if (arg.length === 2 && typeof arg[0]==='string' && typeof arg[1]==='string') {
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             var foundHandler=false,
                 handler;
-            elem.handlers.forEach(function(obj,i){
+            //before change
+            // elem.handlers.forEach(function(obj,i){
+            for(var i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
+                var obj=elem.handlers[i];
                 if(obj.event===arg[0] && obj.attachedTo===arg[1]){
                     handler=obj.handler;
                     elem.handlers.splice(i,1);
                     foundHandler=true;
                 }
-            });
+            };
             if(foundHandler){
                 elem.removeEventListener(arg[0], handler);
             }
@@ -777,7 +799,7 @@ window.EasyScriptConstructor.prototype.on=function () {
     if (arg.length < 2) {
         return false;
     } else if (arg.length === 2) {
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             if(typeof elem.handlers==='undefined'){
                 elem.handlers=[];
             }
@@ -789,7 +811,7 @@ window.EasyScriptConstructor.prototype.on=function () {
             elem.addEventListener(arg[0], arg[1]);
         });
     } else {
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             if(typeof elem.handlers==='undefined'){
                 elem.handlers=[];
             }
@@ -832,7 +854,7 @@ window.EasyScriptConstructor.prototype.parent=function () {
 window.EasyScriptConstructor.prototype.prepend=function () {
     var arg = arguments,
         elems=this.js;
-    Array.prototype.forEach.call(elems, function(elem, index) {
+    elems.forEach(function(elem, index) {
         if (typeof arg[0] === 'string') {
             elem.innerHTML = arg[0] + elem.innerHTML;
         } else if (elem.childNodes.length > 0) {
@@ -902,7 +924,7 @@ window.EasyScriptConstructor.prototype.prop=function () {
     var arg = arguments,
         elems=this.js;
     if (arg.length > 1) {
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             elem[arg[0]] = arg[1];
         });
     } else if (arg.length === 1) {
@@ -920,16 +942,18 @@ window.EasyScriptConstructor.prototype.prop=function () {
 window.EasyScriptConstructor.prototype.removeClass=function () {
     var arg = arguments,
         elems=this.js;
-    Array.prototype.forEach.call(elems, function(elem, index) {
+    elems.forEach(function(elem, index) {
         var classArray = arg[0].split(' ');
-        classArray.forEach(function(currentClass, index) {
+        for(var ind=0, classLength=classArray.length; ind < classLength; ind++){
+            var currentClass=classArray[ind];
             var classes=elem.className.split(' ');
-            classes.forEach(function(value) {
+            for(var i=0, classesLength=classes.length; i < classesLength; i++){
+                var value=classes[i];
                 if(value===currentClass){
                     elem.className = elem.className.replace(currentClass, '');
                 }
-            });
-        });
+            };
+        };
     });
     return this;
 }
@@ -940,7 +964,7 @@ window.EasyScriptConstructor.prototype.removeClass=function () {
 window.EasyScriptConstructor.prototype.replaceClass=function () {
     var arg = arguments,
         elems=this.js;
-    Array.prototype.forEach.call(elems, function(elem, index) {
+    elems.forEach(function(elem, index) {
         var regex = new RegExp(arg[0], 'g');
         elem.className = elem.className.replace(regex, arg[1]);
     });
@@ -1015,13 +1039,13 @@ window.EasyScriptConstructor.prototype.show=function () {
     switch (typeof arg[0]) {
         case 'undefined':
         case 'string':
-            Array.prototype.forEach.call(elems, function(elem, index) {
+            elems.forEach(function(elem, index) {
                 elem.style.display = arg[0] || 'initial';
             });
             break;
         case 'number':
             setTimeout(function() {
-                Array.prototype.forEach.call(elems, function(elem, index) {
+                elems.forEach(function(elem, index) {
                     elem.style.display = arg[1] || 'initial';
                 });
             }, arg[0]);
@@ -1123,7 +1147,7 @@ window.EasyScriptConstructor.prototype.width=function () {
     } else if (typeof arg[0] === 'boolean' && arg[0]===false) {
         return elems[0].clientWidth;
     } else if (typeof arg[0] === 'number') {
-        Array.prototype.forEach.call(elems, function(elem, index) {
+        elems.forEach(function(elem, index) {
             elem.style.width = arg[0] + 'px';
         });
         return this;
@@ -1303,6 +1327,8 @@ window.EasyScript.replaceAll=function(){
     }
 }
 
+
+
 //two-way data binding
 //arguments: scopeName , scopeValue
 //------------string-------any-------------
@@ -1362,249 +1388,240 @@ window.EasyScript.scope=function(){
     }
     function html() {
         var arg = arguments,
-            elem = arg[1]||arg[0];
-        if (arg.length === 1) {
-            return elem.innerHTML;
-        } else {
-            elem.innerHTML = arg[0];
-        }
+            elem = arg[1];
+        elem.innerHTML = arg[0];
     }
     function attr() {
         var arg = arguments,
-            elem=arg[2]||arg[1];
-        if (arg.length > 2) {
-            elem.setAttribute(arg[0],arg[1]);
-        } else {
-            return elem.getAttribute(arg[0]);
-        }
+            elem=arg[2];
+        elem.setAttribute(arg[0],arg[1]);
     }
-    Array.prototype.forEach.call(scope,function(elem,index){
+    function scopeFor(elem){
+        
         //get the seperated bindings
         var binding=elem.getAttribute('data-bind').replace(/{/g,'').split('}');
         binding.splice(binding.length-1,1);
         
         //activate all bindings
-        binding.forEach(function(v,i){
-            //get the key and the event that it is bound to
-            var key=v.split(',')[0].split('.').join(''),
-                event=v.split(',')[1];
-            if(event==='class'){
-                var splittedKey=key.split('?'),
-                    trueClass=splittedKey[1].split(':')[0].trim().replace(/"/g,'').replace(/'/g,''),
-                    falseClass=splittedKey[1].split(':')[1].trim().replace(/"/g,'').replace(/'/g,'');
-                if(splittedKey[0].trim().indexOf('!')===0){
-                    [trueClass,falseClass]=[falseClass,trueClass];
-                }
-                key=splittedKey[0].trim().replace('!','');
-                if(key===arg[0].split('.').join('')){
-                    if(!elem[key+'ClassChanged']){
-                        var ev=new Event(key+'ClassChanged');
-                        elem.setAttribute('data-'+key+'ClassChanged',true);
-                        elem[key+'ClassChanged']=ev;
-                        elem.addEventListener(ev,function(){
-                            if(key.indexOf('.') > -1){
-                                var subKeys=key.split('.'),
-                                    subValue=E.scope[key];
-                                for(var x=1; x < subKeys.length; x++){
-                                    subValue=subValue[subKeys[x]];
-                                }
-                            }
-                            else{
-                                var subValue=E.scope[key];
-                            }
-                            if(subValue){
-                                if(falseClass.trim()!==''){
-                                    removeClass(falseClass,elem);
-                                }
-                                if(trueClass.trim()!==''){
-                                    addClass(trueClass,elem);
-                                }
-                            }
-                            else{
-                                if(falseClass.trim()!==''){
-                                    addClass(falseClass,elem);
-                                }
-                                if(trueClass.trim()!==''){
-                                    removeClass(trueClass,elem);
-                                }
-                            }
-                        },false);
-                    }
+        for(var i=0, bindingLength=binding.length; i < bindingLength; i++){
+            bindingFor(binding[i],elem);
+        }
+    }
+    function bindingFor(v,elem){
+        //get the key and the event that it is bound to
+        var key=v.split(',')[0].split('.').join(''),
+            event=v.split(',')[1];
+        if(event==='class'){
+            ifClass(key,event,elem,v);
+        }
+        //if the key roots are the same
+        else if(key===arg[0].split('.').join('')){
+            ifNotClass(key,event,elem,v);
+        }
+        else if(typeof arg[1]==='object' && v.split(',')[0].split('.')[0]===arg[0].split('.')[0]){
+            iterateOnObject(arg[1],v);
+        }
+    }
+    function dispatchEventFor(telem,tevent,teventName){
+        tevent.initEvent(telem[teventName], true, true);
+        tevent.eventName = telem[teventName];
+        telem.dispatchEvent(tevent);
+    }
+    function ifClass(key,event,elem,v){
+        var splittedKey=key.split('?'),
+            trueClass=splittedKey[1].split(':')[0].trim().replace(/"/g,'').replace(/'/g,''),
+            falseClass=splittedKey[1].split(':')[1].trim().replace(/"/g,'').replace(/'/g,'');
+        if(splittedKey[0].trim().indexOf('!')===0){
+            [trueClass,falseClass]=[falseClass,trueClass];
+        }
+        key=splittedKey[0].trim().replace('!','');
+        if(key===arg[0].split('.').join('')){
+            if(!elem[key+'ClassChanged']){
+                var ev=new Event(key+'ClassChanged');
+                elem.setAttribute('data-'+key+'ClassChanged',true);
+                elem[key+'ClassChanged']=ev;
+                elem.addEventListener(ev,function(){
                     if(key.indexOf('.') > -1){
                         var subKeys=key.split('.'),
                             subValue=E.scope[key];
                         for(var x=1; x < subKeys.length; x++){
                             subValue=subValue[subKeys[x]];
                         }
-                        set(E.scope[key], key.replace(key+'.',''), subValue);
                     }
                     else{
-                        E.scope[key]=arg[1];
+                        var subValue=E.scope[key];
                     }
-                    Array.prototype.forEach.call(document.querySelectorAll('[data-'+key+'ClassChanged]'),function(telem,tindex){
-                        var tevent;
-                        tevent = document.createEvent("HTMLEvents");
-                        tevent.initEvent(telem[key+'ClassChanged'], true, true);
-
-                        tevent.eventName = telem[key+'ClassChanged'];
-                        telem.dispatchEvent(tevent);
-                    });
-                }
-                else if(typeof arg[1]==='object' && v.split(',')[0].split('.')[0]===arg[0].split('.')[0]){
-                    function iterateOnObjectClass(obj){
-                        for(key in obj){
-                            if(typeof obj[key]==='object'){
-                                iterateOnObjectClass(obj[key]);
-                            }
-                            else if(v.split('?')[0].trim().split('.')[v.split('?')[0].trim().split('.').length-1]===key && E.scopeRenderedObjects.indexOf(key) < 0){
-                                E.scopeRenderedObjects.push(key);
-                                E.scope(v.split('?')[0].trim(),obj[key]);
-                                break;
-                            }
+                    if(subValue){
+                        if(falseClass.trim()!==''){
+                            removeClass(falseClass,elem);
+                        }
+                        if(trueClass.trim()!==''){
+                            addClass(trueClass,elem);
                         }
                     }
-                    iterateOnObjectClass(arg[1]);
-                }
+                    else{
+                        if(falseClass.trim()!==''){
+                            addClass(falseClass,elem);
+                        }
+                        if(trueClass.trim()!==''){
+                            removeClass(trueClass,elem);
+                        }
+                    }
+                },false);
             }
-            //if the key roots are the same
-            else if(key===arg[0].split('.').join('')){
-                
-                var argObject=(typeof arg[1]==='object');
-                
-                //if the value is an object or array
-                if(argObject){
-                    var oldKey=key;
-                    key=key;
-                    E.scope[key]=arg[1];
+            E.scope[key]=arg[1];
+            var tevent,
+                teventName=key+'ClassChanged',
+                thisElem=document.querySelectorAll('[data-'+key+'ClassChanged]');
+            tevent = document.createEvent("HTMLEvents");
+            for(var tindex=0, elemLen=thisElem.length; tindex < elemLen; tindex++){
+                dispatchEventFor(thisElem[tindex],tevent,teventName);
+            }
+        }
+        else if(typeof arg[1]==='object' && v.split(',')[0].split('.')[0]===arg[0].split('.')[0]){
+            iterateOnObjectClass(arg[1],v);
+        }
+    }
+    function ifNotClass(key,event,elem,v){
+        var argObject=(typeof arg[1]==='object');
+        
+        //if the value is an object or array
+        if(argObject){
+            var oldKey=key;
+            key=key;
+            E.scope[key]=arg[1];
+        }
+        
+        //if the event is not yet bound to the element
+        if(!elem[key+'Changed']){
+            //bind the event to the element
+            var ev=new Event(key+'Changed');
+            elem.setAttribute('data-'+key+'Changed',true);
+            elem[key+'Changed']=ev;
+            elem.addEventListener(ev,function(){
+                if(argObject //it means if the value given is an object 
+                    && oldKey.indexOf('.') > -1 //and the key is a route to the sub variable of an object
+                    ){
+                    var subKeys=oldKey.split('.'),
+                        subValue=E.scope[key];
+                    for(var x=1; x < subKeys.length; x++){
+                        subValue=subValue[subKeys[x]];
+                    }
+                    if(event==='value'){
+                        val(subValue,elem);
+                    }
+                    else if(event==='html'){
+                        html(subValue,elem);
+                    }
+                    else if(event==='checked' || event==='disabled'){
+                        prop(event,subValue,elem);
+                    }
+                    else if(event==='src'){
+                        attr(event,subValue,elem);
+                    }
                 }
-                
-                //if the event is not yet bound to the element
-                if(!elem[key+'Changed']){
-                    //bind the event to the element
-                    var ev=new Event(key+'Changed');
-                    elem.setAttribute('data-'+key+'Changed',true);
-                    elem[key+'Changed']=ev;
-                    elem.addEventListener(ev,function(){
-                        if(argObject //it means if the value given is an object 
-                            && oldKey.indexOf('.') > -1 //and the key is a route to the sub variable of an object
-                            ){
-                            var subKeys=oldKey.split('.'),
-                                subValue=E.scope[key];
-                            for(var x=1; x < subKeys.length; x++){
-                                subValue=subValue[subKeys[x]];
+                else{ //if the given value is not an object and the key is not a route to the sub variable of an object
+                    if(event==='value'){
+                        val(E.scope[key],elem);
+                    }
+                    else if(event==='html'){
+                        html(E.scope[key],elem);
+                    }
+                    else if(event==='checked' || event==='disabled'){
+                        prop(event,E.scope[key],elem);
+                    }
+                    else if(event==='src'){
+                        attr(event,E.scope[key],elem);
+                    }
+                }
+            });
+            
+            if(event==='value' || event==='checked'){
+                if(elem.type==='email' || elem.type==='number' || elem.type==='password' || elem.type==='search' || elem.type==='tel' || elem.type==='text' || elem.type==='url' || elem.type==='textarea'){
+                    elem.addEventListener('input',function(){
+                        if(typeof oldKey!=='undefined' //which means if the given value is an object 
+                            && oldKey.indexOf('.') > -1){ //and the given key is a route to the sub variable of an object
+                            set(E.scope[key], oldKey.replace(key+'.',''), val(elem));
+                        }
+                        else{ //if the given value is not an object and the key is not a route to the sub variable of an object
+                            E.scope[key]=val(elem);
+                        }
+                        var tevent,
+                            teventName=key+'Changed',
+                            thisElem=document.querySelectorAll('[data-'+key+'Changed]');
+                        tevent = document.createEvent("HTMLEvents");
+                        for(var tindex=0, elemLen=thisElem.length; tindex < elemLen; tindex++){
+                            dispatchEventFor(thisElem[tindex],tevent,teventName);
+                        }
+                    },true);
+                }
+                else{
+                    elem.addEventListener('change',function(){
+                        if(typeof oldKey!=='undefined' //which means if the given value is an object 
+                            && oldKey.indexOf('.') > -1){ //and the given key is a route to the sub variable of an object
+                            if(event==='checked' || event==='disabled'){
+                                set(E.scope[key], oldKey.replace(key+'.',''), prop(event,elem));
                             }
-                            if(event==='value'){
-                                val(subValue,elem);
-                            }
-                            else if(event==='html'){
-                                html(subValue,elem);
-                            }
-                            else if(event==='checked' || event==='disabled'){
-                                prop(event,subValue,elem);
-                            }
-                            else if(event==='src'){
-                                attr(event,subValue,elem);
+                            else{
+                                set(E.scope[key], oldKey.replace(key+'.',''), val(elem));
                             }
                         }
                         else{ //if the given value is not an object and the key is not a route to the sub variable of an object
-                            if(event==='value'){
-                                val(E.scope[key],elem);
+                            if(event==='checked' || event==='disabled'){
+                                E.scope[key]=prop(event,elem);
                             }
-                            else if(event==='html'){
-                                html(E.scope[key],elem);
-                            }
-                            else if(event==='checked' || event==='disabled'){
-                                prop(event,E.scope[key],elem);
-                            }
-                            else if(event==='src'){
-                                attr(event,E.scope[key],elem);
+                            else{
+                                E.scope[key]=val(elem);
                             }
                         }
-                    });
-                    
-                    if(event==='value' || event==='checked'){
-                        if(elem.type==='email' || elem.type==='number' || elem.type==='password' || elem.type==='search' || elem.type==='tel' || elem.type==='text' || elem.type==='url' || elem.type==='textarea'){
-                            elem.addEventListener('input',function(){
-                                if(typeof oldKey!=='undefined' //which means if the given value is an object 
-                                    && oldKey.indexOf('.') > -1){ //and the given key is a route to the sub variable of an object
-                                    set(E.scope[key], oldKey.replace(key+'.',''), val(elem));
-                                }
-                                else{ //if the given value is not an object and the key is not a route to the sub variable of an object
-                                    E.scope[key]=val(elem);
-                                }
-                                Array.prototype.forEach.call(document.querySelectorAll('[data-'+key+'Changed]'),function(telem,tindex){
-                                    var tevent;
-                                    tevent = document.createEvent("HTMLEvents");
-                                    tevent.initEvent(telem[key+'Changed'], true, true);
-
-                                    tevent.eventName = telem[key+'Changed'];
-                                    telem.dispatchEvent(tevent);
-                                });
-                            },true);
+                        var tevent,
+                            teventName=key+'Changed',
+                            thisElem=document.querySelectorAll('[data-'+key+'Changed]');
+                        tevent = document.createEvent("HTMLEvents");
+                        for(var tindex=0, elemLen=thisElem.length; tindex < elemLen; tindex++){
+                            dispatchEventFor(thisElem[tindex],tevent,teventName);
                         }
-                        else{
-                            elem.addEventListener('change',function(){
-                                if(typeof oldKey!=='undefined' //which means if the given value is an object 
-                                    && oldKey.indexOf('.') > -1){ //and the given key is a route to the sub variable of an object
-                                    if(event==='checked' || event==='disabled'){
-                                        set(E.scope[key], oldKey.replace(key+'.',''), prop(event,elem));
-                                    }
-                                    else{
-                                        set(E.scope[key], oldKey.replace(key+'.',''), val(elem));
-                                    }
-                                }
-                                else{ //if the given value is not an object and the key is not a route to the sub variable of an object
-                                    if(event==='checked' || event==='disabled'){
-                                        E.scope[key]=prop(event,elem);
-                                    }
-                                    else{
-                                        E.scope[key]=val(elem);
-                                    }
-                                }
-                                Array.prototype.forEach.call(document.querySelectorAll('[data-'+key+'Changed]'),function(telem,tindex){
-                                    var tevent;
-                                    tevent = document.createEvent("HTMLEvents");
-                                    tevent.initEvent(telem[key+'Changed'], true, true);
-
-                                    tevent.eventName = telem[key+'Changed'];
-                                    telem.dispatchEvent(tevent);
-                                });
-                            },true);
-                        }
-                    }
+                    },true);
                 }
-                if(key.indexOf('.') > -1){ //which means the value is going to be changed not set 
-                    set(E.scope[key], arg[0].replace(key+'.',''), arg[1]);
-                }
-                else{
-                    E.scope[key]=arg[1];
-                }
-                Array.prototype.forEach.call(document.querySelectorAll('[data-'+key+'Changed]'),function(telem,tindex){
-                    var tevent;
-                    tevent = document.createEvent("HTMLEvents");
-                    tevent.initEvent(telem[key+'Changed'], true, true);
-
-                    tevent.eventName = telem[key+'Changed'];
-                    telem.dispatchEvent(tevent);
-                });
             }
-            else if(typeof arg[1]==='object' && v.split(',')[0].split('.')[0]===arg[0].split('.')[0]){
-                function iterateOnObject(obj){
-                    for(key in obj){
-                        if(typeof obj[key]==='object'){
-                            iterateOnObject(obj[key]);
-                        }
-                        else if(v.split(',')[0].split('.')[v.split(',')[0].split('.').length-1]===key && E.scopeRenderedObjects.indexOf(key) < 0){
-                            E.scopeRenderedObjects.push(key);
-                            E.scope(v.split(',')[0],obj[key]);
-                            break;
-                        }
-                    }
-                }
-                iterateOnObject(arg[1]);
+        }
+        E.scope[key]=arg[1];
+        var tevent,
+            teventName=key+'Changed',
+            thisElem=document.querySelectorAll('[data-'+key+'Changed]');
+        tevent = document.createEvent("HTMLEvents");
+        
+        for(var tindex=0, elemLen=thisElem.length; tindex < elemLen; tindex++){
+            dispatchEventFor(thisElem[tindex],tevent,teventName);
+        }
+    }
+    function iterateOnObject(obj,v){
+        for(var key in obj){
+            if(typeof obj[key]==='object'){
+                iterateOnObject(obj[key],v);
             }
-        });
-    });
+            else if(v.split(',')[0].split('.')[v.split(',')[0].split('.').length-1]===key && E.scopeRenderedObjects.indexOf(key) < 0){
+                E.scopeRenderedObjects.push(key);
+                E.scope(v.split(',')[0],obj[key]);
+                break;
+            }
+        }
+    }
+    function iterateOnObjectClass(obj,v){
+        for(var key in obj){
+            if(typeof obj[key]==='object'){
+                iterateOnObjectClass(obj[key],v);
+            }
+            else if(v.split('?')[0].trim().split('.')[v.split('?')[0].trim().split('.').length-1]===key && E.scopeRenderedObjects.indexOf(key) < 0){
+                E.scopeRenderedObjects.push(key);
+                E.scope(v.split('?')[0].trim(),obj[key]);
+                break;
+            }
+        }
+    }
+    for(var index=0, scopeLength=scope.length; index < scopeLength; index++){
+        scopeFor(scope[index]);
+    }
 }
 
 //push state
@@ -1623,10 +1640,7 @@ window.EasyScript.state={
             if(e.state){
                 E(arg[0]).html(e.state.content);
                 var elem=arg[0],
-                    count=0;
-                Array.prototype.forEach.call(E(elem).js[0].querySelectorAll('script'),function(file,index){
-                    count++;
-                });
+                    count=E(elem).js[0].querySelectorAll('script').length;
                 for(var i=0; i < count; i++){
                     var src=E(elem).js[0].querySelectorAll('script')[i].getAttribute('src');
                     E(elem).js[0].querySelectorAll('script')[i].parentNode.removeChild(E(elem).js[0].querySelectorAll('script')[i]);
