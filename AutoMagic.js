@@ -1,7 +1,7 @@
 //version 1.0.1
 
 //defining the constructor
-window.EasyScriptConstructor=function(){
+window.AutoMagicConstructor=function(){
     this.selector=null;
     this.length=0;
     this.js=null;
@@ -41,7 +41,7 @@ function scrollTo(to, duration, direction,elem) {
     setTimeout(function() {
         elem[direction] = elem[direction] + perTick;
         if (elem[direction] === to) return;
-        scrollTo(to, duration - 10, direction);
+        scrollTo(to, duration - 10, direction,elem);
     }, 10);
 }
 //************************************************************
@@ -52,9 +52,9 @@ function scrollTo(to, duration, direction,elem) {
 //selector
 //arguments: selector
 //-------------cssSelector------------
-window.E = E = EasyScript = window.EasyScript=function(selector){
-    var E = new window.EasyScriptConstructor;
-    E.selector=selector;
+window.am = am = AutoMagic = window.AutoMagic=function(selector){
+    var am = new window.AutoMagicConstructor;
+    am.selector=selector;
     
     var elems;
     if (typeof selector === 'undefined') {
@@ -68,12 +68,12 @@ window.E = E = EasyScript = window.EasyScript=function(selector){
     } else if (typeof selector === 'string') {
         elems = document.querySelectorAll(selector);
     } else {
-        E.throwError('Selector must be a string');
+        am.throwError('Selector must be a string');
         return false;
     }
-    E.length=elems.length;
-    E.js=elems;
-    return E;
+    am.length=elems.length;
+    am.js=elems;
+    return am;
 }
 
 //************************************************************
@@ -83,7 +83,7 @@ window.E = E = EasyScript = window.EasyScript=function(selector){
 //add class to element
 //arguments: className
 //------------string------------
-window.EasyScriptConstructor.prototype.addClass=function(){
+window.AutoMagicConstructor.prototype.addClass=function(){
     var arg = arguments,
         elems=this.js;
     for(var index=0, elemLength=elems.length; index < elemLength; index++){
@@ -102,11 +102,11 @@ window.EasyScriptConstructor.prototype.addClass=function(){
 //animate a css property
 //arguments: propertiesAndValues , duration , easing
 //---------------object-------------number----string------------
-window.EasyScriptConstructor.prototype.animate= function() {
+window.AutoMagicConstructor.prototype.animate= function() {
     var arg = arguments,
         elems=this.js;
     if (typeof arg[0] !== 'object' || arg.length < 1) {
-        E.throwError('SyntaxError: Please specify css values to animate');
+        am.throwError('SyntaxError: Please specify css values to animate');
     } else {
         if (typeof arg[1] === 'number') {
             var propArray = [];
@@ -225,7 +225,7 @@ window.EasyScriptConstructor.prototype.animate= function() {
 //append to element
 //arguments: tobeAppended
 //-----------string , DOM--------------------
-window.EasyScriptConstructor.prototype.append=function() {
+window.AutoMagicConstructor.prototype.append=function() {
     var arg = arguments,
         elems=this.js;
     elems.forEach(function(elem, index) {
@@ -241,7 +241,7 @@ window.EasyScriptConstructor.prototype.append=function() {
 //get or set attribute
 //arguments: attributeName , value
 //--------------string-------string-----------
-window.EasyScriptConstructor.prototype.attr=function() {
+window.AutoMagicConstructor.prototype.attr=function() {
     var arg = arguments,
         elems=this.js;
     if (arg.length > 1) {
@@ -258,7 +258,7 @@ window.EasyScriptConstructor.prototype.attr=function() {
 //get the closest ancestor with the given query
 //arguments: selector
 //----------- string -------------
-window.EasyScriptConstructor.prototype.closest=function () {
+window.AutoMagicConstructor.prototype.closest=function () {
     var arg = arguments;
     elem = this.js[0];
     var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
@@ -268,17 +268,17 @@ window.EasyScriptConstructor.prototype.closest=function () {
         }
         elem = elem.parentNode;
     }
-    return (elem.tagName.toLowerCase() == 'html') ? null : E(elem);
+    return (elem.tagName.toLowerCase() == 'html') ? null : am(elem);
 };
 
 //set or get a css property
 //arguments: propertiesAndValues
 //---------------object-------------
-window.EasyScriptConstructor.prototype.css=function () {
+window.AutoMagicConstructor.prototype.css=function () {
     var arg = arguments,
         elems=this.js;
     if (arg.length < 1) {
-        E.throwError('SyntaxError: no arguments given');
+        am.throwError('SyntaxError: no arguments given');
         return undefined;
     } else if(typeof arg[0] === 'string' && arg.length === 1){
         return window.getComputedStyle(elems[0]).getPropertyValue(arg[0]);
@@ -334,7 +334,7 @@ window.EasyScriptConstructor.prototype.css=function () {
 //get or set the value of the data attribute
 //arguments: dataAttributeName , dataAttributeValue
 //--------------string----------------any-----------------
-window.EasyScriptConstructor.prototype.data=function (){
+window.AutoMagicConstructor.prototype.data=function (){
     var arg = arguments,
         elems=this.js;
     if (arg.length > 1) {
@@ -356,7 +356,7 @@ window.EasyScriptConstructor.prototype.data=function (){
 //iterate over elements
 //arguments: callback(element,value)
 //-----------------function------------------
-window.EasyScriptConstructor.prototype.each=function () {
+window.AutoMagicConstructor.prototype.each=function () {
     var arg = arguments,
         elems=this.js;
     elems.forEach(function(elem, index) {
@@ -367,33 +367,34 @@ window.EasyScriptConstructor.prototype.each=function () {
 //select the given index in the selector
 //arguments: index
 //-----------number------------
-window.EasyScriptConstructor.prototype.eq=function (){
+window.AutoMagicConstructor.prototype.eq=function (){
     var arg=arguments,
         elems=this.js;
     if(arg.length===0){
         return undefined;
     }
     else{
-        return E(elems[arg[0]]);
+        return am(elems[arg[0]]);
     }
 }
     
 //find the selector descendent to the selected element
 //arguments: selector
 //-----------selector----------------
-window.EasyScriptConstructor.prototype.find=function (){
+window.AutoMagicConstructor.prototype.find=function (){
     var arg=arguments,
         elems=this.js;
-    return E(elems[0].querySelector(arg[0]));
+    return am(elems[0].querySelector(arg[0]));
 } 
     
 //check if element has the selected element
 //arguments: selector
 //-----------selector-------------
-window.EasyScriptConstructor.prototype.has=function (){
+window.AutoMagicConstructor.prototype.has=function (){
     var arg=arguments,
         elem=this.js[0],
-        child=E(arg[0]).js[0];
+        child=am(arg[0]).js[0];
+    if(typeof child==='undefined') return false;
     var node = child.parentNode;
     while (node != null) {
         if (node == elem) {
@@ -407,7 +408,7 @@ window.EasyScriptConstructor.prototype.has=function (){
 //check if element has the given class
 //arguments: class
 //-----------string-------------
-window.EasyScriptConstructor.prototype.hasClass=function (){
+window.AutoMagicConstructor.prototype.hasClass=function (){
     var arg=arguments,
         elem=this.js[0];
     if(arg.length>0){
@@ -419,7 +420,7 @@ window.EasyScriptConstructor.prototype.hasClass=function (){
 //get the height of an element
 //arguments: value or includeBorder
 //----------number------boolean---------------
-window.EasyScriptConstructor.prototype.height=function () {
+window.AutoMagicConstructor.prototype.height=function () {
     var arg = arguments,
         elems=this.js;
     if (arg.length === 0) {
@@ -439,7 +440,7 @@ window.EasyScriptConstructor.prototype.height=function () {
 //hide element
 //arguments: delay
 //----------integer------------
-window.EasyScriptConstructor.prototype.hide=function () {
+window.AutoMagicConstructor.prototype.hide=function () {
     var arg = arguments,
         elems=this.js;
     if (arg.length === 0) {
@@ -459,7 +460,7 @@ window.EasyScriptConstructor.prototype.hide=function () {
 //get or set the the html of the element
 //arguments: html
 //----------string---------------
-window.EasyScriptConstructor.prototype.html=function () {
+window.AutoMagicConstructor.prototype.html=function () {
     var arg = arguments,
         elem = this.js[0];
     if (arg.length === 0) {
@@ -473,7 +474,7 @@ window.EasyScriptConstructor.prototype.html=function () {
 //to get the index of the selected element in the parent
 //arguments: none
 //-------------------------------
-window.EasyScriptConstructor.prototype.index=function (){
+window.AutoMagicConstructor.prototype.index=function (){
     var elems=this.js;
     if(elems.length===0) return -1;
     var node=elems[0],
@@ -489,7 +490,7 @@ window.EasyScriptConstructor.prototype.index=function (){
 //insert string at the carret position
 //arguments: string
 //-----------string------------
-window.EasyScriptConstructor.prototype.insertAtCaret=function () {
+window.AutoMagicConstructor.prototype.insertAtCaret=function () {
     var arg=arguments,
         elems=this.js,
         text=arg[0],
@@ -530,7 +531,7 @@ window.EasyScriptConstructor.prototype.insertAtCaret=function () {
 //check if element is the same as the selector
 //arguments: selector
 //-----------selector------------
-window.EasyScriptConstructor.prototype.is=function (){
+window.AutoMagicConstructor.prototype.is=function (){
     var arg=arguments,
         elem=this.js[0];
     if(arg.length>0){
@@ -546,7 +547,7 @@ window.EasyScriptConstructor.prototype.is=function (){
         if(arg[0]===':empty'){
             return elem.value==='';
         }
-        return elem===E(arg[0]).js[0];
+        return elem===am(arg[0]).js[0];
     }
     return undefined;
 }
@@ -554,7 +555,7 @@ window.EasyScriptConstructor.prototype.is=function (){
 //check if the element is loaded or load data into the element
 //arguments: callback or url , callback
 //-----------function--string--function-----
-window.EasyScriptConstructor.prototype.load=function (){
+window.AutoMagicConstructor.prototype.load=function (){
     var arg=arguments,
         elem=this.js[0];
     if(arg.length>0){
@@ -570,8 +571,8 @@ window.EasyScriptConstructor.prototype.load=function (){
                     var response = req.responseText;
                     if (req.status == 200) {
                         elem.innerHTML=response;
-                        var src=E(elem).js[0].querySelector('script').getAttribute('src');
-                        E(elem).js[0].querySelector('script').parentNode.removeChild(E(elem).js[0].querySelector('script'));
+                        var src=am(elem).js[0].querySelector('script').getAttribute('src');
+                        am(elem).js[0].querySelector('script').parentNode.removeChild(am(elem).js[0].querySelector('script'));
                         var script = document.createElement('script');
                         script.type = 'text/javascript';
                         script.src = src;
@@ -587,7 +588,7 @@ window.EasyScriptConstructor.prototype.load=function (){
                         };
                         elem.appendChild(script);
                     } else if (req.status == 400) {
-                        E.throwError('Something went wrong!');
+                        am.throwError('Something went wrong!');
                     }
                 }
             }
@@ -599,7 +600,7 @@ window.EasyScriptConstructor.prototype.load=function (){
 //get the next element
 //arguments: selector
 //------------string----------
-window.EasyScriptConstructor.prototype.next=function () {
+window.AutoMagicConstructor.prototype.next=function () {
     var arg = arguments,
         elem = this.js[0],
         currentElement = elem.nextElementSibling;
@@ -610,17 +611,17 @@ window.EasyScriptConstructor.prototype.next=function () {
         }
     }
     if (currentElement === null) {
-        E.throwError('element not found');
+        am.throwError('element not found');
         return null;
     } else {
-        return E(currentElement);
+        return am(currentElement);
     }
 }
 
 //get all the elements after
 //arguments: selector
 //------------string----------
-window.EasyScriptConstructor.prototype.nextAll=function () {
+window.AutoMagicConstructor.prototype.nextAll=function () {
     var arg = arguments,
         elem = this.js[0],
         currentElement = elem.nextElementSibling,
@@ -640,23 +641,23 @@ window.EasyScriptConstructor.prototype.nextAll=function () {
         }
     }
     if (output.length < 1) {
-        E.throwError('element not found');
+        am.throwError('element not found');
         return null;
     } else {
-        return E(output);
+        return am(output);
     }
 }
     
 //exclude the selector from the selected set of elements
 //arguments: selector
 //------------string--------------
-window.EasyScriptConstructor.prototype.not=function (){
+window.AutoMagicConstructor.prototype.not=function (){
     var arg=arguments,
         output=[],
         elems=this.js;
     elems.forEach(function(elem,index){
         var isNot=true;
-        E(arg[0]).js.forEach(function(notElem,index){
+        am(arg[0]).js.forEach(function(notElem,index){
             if(elem===notElem){
                 isNot=false;
             }
@@ -665,13 +666,13 @@ window.EasyScriptConstructor.prototype.not=function (){
             output.push(elem);
         }
     });
-    return E(output);
+    return am(output);
 }
 
 //remove event listener
 //arguments: event , handler(event)
 //----------string-----function---------
-window.EasyScriptConstructor.prototype.off=function () {
+window.AutoMagicConstructor.prototype.off=function () {
     var arg = arguments,
         elems=this.js;
     if(arg.length===0){
@@ -691,7 +692,7 @@ window.EasyScriptConstructor.prototype.off=function () {
         elems.forEach(function(elem, index) {
             var handler=null;
             if(typeof elem.handlers==='undefined'){
-                E.throwError('The selected event is not attached.');
+                am.throwError('The selected event is not attached.');
                 return undefined;
             }
             //before change
@@ -704,7 +705,7 @@ window.EasyScriptConstructor.prototype.off=function () {
                 }
             };
             if(handler===null){
-                E.throwError('The selected event is not attached.');
+                am.throwError('The selected event is not attached.');
                 return undefined;
             }
             elem.removeEventListener(arg[0],handler);
@@ -725,7 +726,7 @@ window.EasyScriptConstructor.prototype.off=function () {
                 elem.removeEventListener(arg[0], arg[1]);
             }
             else{
-                E.throwError('The selected event is not attached.');
+                am.throwError('The selected event is not attached.');
                 return undefined;
             }
         });
@@ -747,12 +748,12 @@ window.EasyScriptConstructor.prototype.off=function () {
                 elem.removeEventListener(arg[0], handler);
             }
             else{
-                E.throwError('The selected event is not attached.');
+                am.throwError('The selected event is not attached.');
                 return undefined;
             }
         });
     } else {
-        E.throwError('SyntaxError: invalid argument');
+        am.throwError('SyntaxError: invalid argument');
         return undefined;
     }
     return this;
@@ -761,7 +762,7 @@ window.EasyScriptConstructor.prototype.off=function () {
 //get the offset of an element
 //arguments: relativeToThis
 //-------------selector--------------
-window.EasyScriptConstructor.prototype.offset=function () {
+window.AutoMagicConstructor.prototype.offset=function () {
     var arg = arguments,
         elem = this.js[0];
     if (arg.length === 0) {
@@ -777,14 +778,14 @@ window.EasyScriptConstructor.prototype.offset=function () {
             left: x
         };
     } else {
-        var relativeTo = E(arg[0]).js[0];
+        var relativeTo = am(arg[0]).js[0];
         if (relativeTo.contains(elem) && relativeTo !== elem) {
             return {
-                top: E(elem).offset().top - E(relativeTo).offset().top,
-                left: E(elem).offset().left - E(relativeTo).offset().left
+                top: am(elem).offset().top - am(relativeTo).offset().top,
+                left: am(elem).offset().left - am(relativeTo).offset().left
             }
         } else {
-            E.throwError('Illegal Selector: the "relative" element is not an ancestor of the selected element or they are the same.');
+            am.throwError('Illegal Selector: the "relative" element is not an ancestor of the selected element or they are the same.');
             return undefined;
         }
     }
@@ -793,7 +794,7 @@ window.EasyScriptConstructor.prototype.offset=function () {
 //add event listener
 //arguments: event , targetSelector, callback(event)
 //----------string-------string--------function---------
-window.EasyScriptConstructor.prototype.on=function () {
+window.AutoMagicConstructor.prototype.on=function () {
     var arg = arguments,
         elems=this.js;
     if (arg.length < 2) {
@@ -818,7 +819,7 @@ window.EasyScriptConstructor.prototype.on=function () {
             elem.handlers.push({
                 event:arg[0],
                 handler:function(event) {
-                    var target = window.EasyScript(event.target).closest(arg[1]);
+                    var target = window.AutoMagic(event.target).closest(arg[1]);
                     if (target === null) return false;
                     arg[2].call(target.js[0], event);
                 },
@@ -833,25 +834,25 @@ window.EasyScriptConstructor.prototype.on=function () {
 //get the parent of the element
 //arguments: selector
 //------------string---------------
-window.EasyScriptConstructor.prototype.parent=function () {
+window.AutoMagicConstructor.prototype.parent=function () {
     var arg = arguments,
         elem = this.js[0];
     if (arg.length > 0) {
         var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
         if (matchesSelector.call(elem, arg[0])) {
-            return E(elem.parentNode);
+            return am(elem.parentNode);
         } else {
             return false;
         }
     } else {
-        return E(elem.parentNode);
+        return am(elem.parentNode);
     }
 }
 
 //prepend to element
 //arguments: tobePrepended
 //-----------string , DOM--------------------
-window.EasyScriptConstructor.prototype.prepend=function () {
+window.AutoMagicConstructor.prototype.prepend=function () {
     var arg = arguments,
         elems=this.js;
     elems.forEach(function(elem, index) {
@@ -869,7 +870,7 @@ window.EasyScriptConstructor.prototype.prepend=function () {
 //get the previous element
 //arguments: selector
 //------------string----------
-window.EasyScriptConstructor.prototype.prev=function () {
+window.AutoMagicConstructor.prototype.prev=function () {
     var arg = arguments,
         elem = this.js[0],
         currentElement = elem.previousElementSibling;
@@ -880,17 +881,17 @@ window.EasyScriptConstructor.prototype.prev=function () {
         }
     }
     if (currentElement === null) {
-        E.throwError('element not found');
+        am.throwError('element not found');
         return null;
     } else {
-        return E(currentElement);
+        return am(currentElement);
     }
 }
 
 //get all the elements before
 //arguments: selector
 //------------string----------
-window.EasyScriptConstructor.prototype.prevAll=function () {
+window.AutoMagicConstructor.prototype.prevAll=function () {
     var arg = arguments,
         elem = this.js[0],
         currentElement = elem.previousElementSibling,
@@ -910,17 +911,17 @@ window.EasyScriptConstructor.prototype.prevAll=function () {
         }
     }
     if (output.length < 1) {
-        E.throwError('element not found');
+        am.throwError('element not found');
         return null;
     } else {
-        return E(output);
+        return am(output);
     }
 }
 
 //get or set property value
 //arguments: property , value
 //------------string-----any------
-window.EasyScriptConstructor.prototype.prop=function () {
+window.AutoMagicConstructor.prototype.prop=function () {
     var arg = arguments,
         elems=this.js;
     if (arg.length > 1) {
@@ -930,7 +931,7 @@ window.EasyScriptConstructor.prototype.prop=function () {
     } else if (arg.length === 1) {
         return elems[0][arg[0]];
     } else {
-        E.throwError('Syntax error: please specify a property as an argument');
+        am.throwError('Syntax error: please specify a property as an argument');
         return undefined;
     }
     return this;
@@ -939,7 +940,7 @@ window.EasyScriptConstructor.prototype.prop=function () {
 //remove class from the element
 //arguments: className
 //------------string--------------
-window.EasyScriptConstructor.prototype.removeClass=function () {
+window.AutoMagicConstructor.prototype.removeClass=function () {
     var arg = arguments,
         elems=this.js;
     elems.forEach(function(elem, index) {
@@ -961,7 +962,7 @@ window.EasyScriptConstructor.prototype.removeClass=function () {
 //replace class of the element
 //arguments: tobeReplacedClassName, replacementClassName
 //------------------string----------------string-----------------
-window.EasyScriptConstructor.prototype.replaceClass=function () {
+window.AutoMagicConstructor.prototype.replaceClass=function () {
     var arg = arguments,
         elems=this.js;
     elems.forEach(function(elem, index) {
@@ -974,7 +975,7 @@ window.EasyScriptConstructor.prototype.replaceClass=function () {
 //get or animate the scroll position
 //arguments: direction , value , duration
 //------------string-----number---number-----------
-window.EasyScriptConstructor.prototype.scroll=function () {
+window.AutoMagicConstructor.prototype.scroll=function () {
     var arg = arguments,
         elem = this.js[0];
     if (arg.length === 0) {
@@ -992,11 +993,11 @@ window.EasyScriptConstructor.prototype.scroll=function () {
                 return undefined;
             }
         } else {
-            E.throwError('SyntaxError: Invalid argument');
+            am.throwError('SyntaxError: Invalid argument');
         }
     } else if (arg.length === 2) {
         if (typeof arg[0] !== 'string' || typeof arg[1] !== 'number') {
-            E.throwError('SyntaxError: Invalid argument');
+            am.throwError('SyntaxError: Invalid argument');
         } else {
             if (arg[0].toLowerCase() === 'x' || arg[0].toLowerCase() === 'left') {
                 elem.scrollLeft = arg[1];
@@ -1008,7 +1009,7 @@ window.EasyScriptConstructor.prototype.scroll=function () {
         }
     } else {
         if (typeof arg[0] !== 'string' || typeof arg[1] !== 'number' || typeof arg[2] !== 'number') {
-            E.throwError('SyntaxError: Invalid argument');
+            am.throwError('SyntaxError: Invalid argument');
         } else {
             if (arg[0].toLowerCase() === 'x' || arg[0].toLowerCase() === 'left') {
                 if (arg[2] <= 0) {
@@ -1033,7 +1034,7 @@ window.EasyScriptConstructor.prototype.scroll=function () {
 //show element
 //arguments: delay , display
 //----------integer--string-----------
-window.EasyScriptConstructor.prototype.show=function () {
+window.AutoMagicConstructor.prototype.show=function () {
     var arg = arguments,
         elems=this.js;
     switch (typeof arg[0]) {
@@ -1051,7 +1052,7 @@ window.EasyScriptConstructor.prototype.show=function () {
             }, arg[0]);
             break;
         default:
-            E.throwError('syntaxError: invalid argument');
+            am.throwError('syntaxError: invalid argument');
             return undefined;
     }
     return this;
@@ -1060,7 +1061,7 @@ window.EasyScriptConstructor.prototype.show=function () {
 //get the siblings that match the selector
 //arguments: selector
 //------------string--------------
-window.EasyScriptConstructor.prototype.siblings=function () {
+window.AutoMagicConstructor.prototype.siblings=function () {
     var arg = arguments,
         elem = this.js[0],
         output = [];
@@ -1078,27 +1079,27 @@ window.EasyScriptConstructor.prototype.siblings=function () {
             }
         });
     }
-    return E(output);
+    return am(output);
 }
 
 //get or set the the text of the element
 //arguments: text
 //----------string---------------
-window.EasyScriptConstructor.prototype.text=function () {
+window.AutoMagicConstructor.prototype.text=function () {
     var arg = arguments,
         elem = this.js[0];
     if (arg.length === 0) {
         return elem.innerText;
     } else {
         elem.innerText = arg[0];
-        return this;
+        return am(this.js[0]);
     }
 }
 
 //to trigger an event on the selected element
 //arguments: eventName
 //------------string-----------------
-window.EasyScriptConstructor.prototype.trigger=function () {
+window.AutoMagicConstructor.prototype.trigger=function () {
     var arg = arguments,
         event,
         elem = this.js[0];
@@ -1123,12 +1124,12 @@ window.EasyScriptConstructor.prototype.trigger=function () {
 //get or set the value of the selected element
 //arguments: value
 //-----------string--------------------
-window.EasyScriptConstructor.prototype.val=function () {
+window.AutoMagicConstructor.prototype.val=function () {
     var arg = arguments,
         elem = this.js[0];
     if (arg.length > 0) {
         elem.value = arg[0];
-        return this;
+        return am(this.js[0]);
     } else {
         return elem.value;
     }
@@ -1137,7 +1138,7 @@ window.EasyScriptConstructor.prototype.val=function () {
 //get the width of an element
 //arguments: value or includeBorder
 //----------number------boolean---------------
-window.EasyScriptConstructor.prototype.width=function () {
+window.AutoMagicConstructor.prototype.width=function () {
     var arg = arguments,
         elems=this.js;
     if (arg.length === 0) {
@@ -1166,7 +1167,7 @@ window.EasyScriptConstructor.prototype.width=function () {
 //ajax call
 //arguments: configuration
 //--------------object--------------
-window.EasyScript.ajax = function() {
+window.AutoMagic.ajax = function() {
     var arg = arguments,
         config = {
             async: arg[0].async || true,
@@ -1241,7 +1242,7 @@ window.EasyScript.ajax = function() {
 //set, get and remove cookies
 //arguments: name , data , daysToExpire 
 //----------string--any-------number----------
-window.EasyScript.cookie=function(){
+window.AutoMagic.cookie=function(){
     var arg=arguments;
     if(arg.length > 1){
         var expires = "";
@@ -1267,7 +1268,7 @@ window.EasyScript.cookie=function(){
 //iterate over array or object
 //arguments: currentInstance , callback(value,index)
 //-------------array,object----function----------
-window.EasyScript.each = function() {
+window.AutoMagic.each = function() {
     var arg = arguments;
     if(Object.prototype.toString.call(arg[0]) === '[object Array]'){
         arg[0].forEach(arg[1]);
@@ -1282,7 +1283,7 @@ window.EasyScript.each = function() {
 //escape string
 //arguments: string
 //-----------string------------
-window.EasyScript.escapeString = function() {
+window.AutoMagic.escapeString = function() {
     var arg = arguments;
     var entityMap = {
         "&": "&amp;",
@@ -1301,14 +1302,14 @@ window.EasyScript.escapeString = function() {
 //document ready
 //arguments: callback
 //-----------function-------------
-window.EasyScript.ready = function() {
+window.AutoMagic.ready = function() {
     var arg = arguments;
     document.addEventListener("DOMContentLoaded", function(event) {
-        window.EasyScript.ready.fired=true;
+        window.AutoMagic.ready.fired=true;
         arg[0]();
         return;
     });
-    if(window.EasyScript.ready.fired){
+    if(window.AutoMagic.ready.fired){
         arg[0]();
     }
 }
@@ -1316,13 +1317,13 @@ window.EasyScript.ready = function() {
 //replace all occurances
 //arguments: targetString , replace , replacement
 //-------------string-------string------string-------------
-window.EasyScript.replaceAll=function(){
+window.AutoMagic.replaceAll=function(){
     var arg=arguments;
     if(arg.length===3){
         return arg[0].split(arg[1]).join(arg[2]);
     }
     else{
-        window.EasyScript.throwError('SyntaxError: three arguments required');
+        window.AutoMagic.throwError('SyntaxError: three arguments required');
         return undefined;
     }
 }
@@ -1330,27 +1331,27 @@ window.EasyScript.replaceAll=function(){
 //push state
 //arguments: multiple scenarios
 //-----------------------------------
-window.EasyScript.state={
+window.AutoMagic.state={
     push:function(){
         var arg=arguments,
             link=((arg[0]==='') ? '/' : arg[0]) || window.location.pathname;
-        window.history.pushState({"content":E(E.state.elem).html()},'',link);
+        window.history.pushState({"content":am(am.state.elem).html()},'',link);
     },
     watch:function(){
         var arg=arguments;
-        E.state.elem=arg[0];
+        am.state.elem=arg[0];
         window.onpopstate = function(e){
             if(e.state){
-                E(arg[0]).html(e.state.content);
+                am(arg[0]).html(e.state.content);
                 var elem=arg[0],
-                    count=E(elem).js[0].querySelectorAll('script').length;
+                    count=am(elem).js[0].querySelectorAll('script').length;
                 for(var i=0; i < count; i++){
-                    var src=E(elem).js[0].querySelectorAll('script')[i].getAttribute('src');
-                    E(elem).js[0].querySelectorAll('script')[i].parentNode.removeChild(E(elem).js[0].querySelectorAll('script')[i]);
+                    var src=am(elem).js[0].querySelectorAll('script')[i].getAttribute('src');
+                    am(elem).js[0].querySelectorAll('script')[i].parentNode.removeChild(am(elem).js[0].querySelectorAll('script')[i]);
                     var script = document.createElement('script');
                     script.type = 'text/javascript';
                     script.src = src;
-                    E(elem).js[0].appendChild(script);
+                    am(elem).js[0].appendChild(script);
                 }
             }
         };
@@ -1361,7 +1362,7 @@ window.EasyScript.state={
 //get, set or remove localStorage
 //arguments: name , value //empty string to remove
 //----------string---any------------
-window.EasyScript.storage = function() {
+window.AutoMagic.storage = function() {
     var arg = arguments;
     if (arg.length > 1 && arg[1] !== '') {
         window.localStorage.setItem(arg[0], JSON.stringify(arg[1]));
@@ -1379,7 +1380,7 @@ window.EasyScript.storage = function() {
 //throw error
 //arguments: text
 //-----------string------------
-window.EasyScript.throwError = function() {
+window.AutoMagic.throwError = function() {
     var arg = arguments;
     console.error(arg[0]);
 };
@@ -1387,7 +1388,7 @@ window.EasyScript.throwError = function() {
 //trim string
 //arguments: string
 //-----------string-------------
-window.EasyScript.trim = function() {
+window.AutoMagic.trim = function() {
     var arg = arguments,
         regex = new RegExp(/\s/, 'g');
     return arg[0].replace(regex, '');
@@ -1397,7 +1398,7 @@ window.EasyScript.trim = function() {
 //unescape string
 //arguments: string
 //-----------string------------
-window.EasyScript.unescapeString = function() {
+window.AutoMagic.unescapeString = function() {
     var arg = arguments;
     var entityMap = {
         "&amp;": "&",
