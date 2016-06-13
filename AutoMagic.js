@@ -1713,3 +1713,17 @@ window.EasyScript.unescapeString = function() {
 //************************************************************
 //end of non-constructor functions ***************************---------------------------------------------------------
 //************************************************************
+
+//test
+
+E.ready(function () { 
+    E.scope('a', {
+        b: {
+            c:true
+        }
+    });
+    var t0 = performance.now();
+    E('span').addClass('active');
+    var t1 = performance.now();
+    console.log('scope: '+(t1-t0));
+});
