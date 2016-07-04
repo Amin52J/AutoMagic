@@ -68,7 +68,7 @@ window.am = am = AutoMagic = window.AutoMagic=function(selector){
     } else if (typeof selector === 'string') {
         elems = document.querySelectorAll(selector);
     } else {
-        am.throwError('Selector must be a string');
+        am.throwError('Inalid selector!');
         return false;
     }
     am.length=elems.length;
@@ -98,6 +98,16 @@ window.AutoMagicConstructor.prototype.addClass=function(){
     };
     return this;
 }
+
+//insert html after the selected element
+//arguments: html
+//----------string------------
+window.AutoMagicConstructor.prototype.after= function() {
+    var arg = arguments,
+        elem=this.js[0];
+    elem.insertAdjacentHTML('afterend',arg[0]);
+    return am(elem);
+};
 
 //animate a css property
 //arguments: propertiesAndValues , duration , easing
@@ -230,7 +240,7 @@ window.AutoMagicConstructor.prototype.append=function() {
         elems=this.js;
     elems.forEach(function(elem, index) {
         if (typeof arg[0] === 'string') {
-            elem.innerHTML += arg[0];
+            elem.insertAdjacentHTML('beforeend',arg[0]);
         } else {
             elem.appendChild(arg[0]);
         }
@@ -254,6 +264,17 @@ window.AutoMagicConstructor.prototype.attr=function() {
     }
     return this;
 }
+
+//insert html before the selected element
+//arguments: html
+//----------string------------
+window.AutoMagicConstructor.prototype.before= function() {
+    var arg = arguments,
+        elem=this.js[0];
+    elem.insertAdjacentHTML('beforebegin',arg[0]);
+    return am(elem);
+};
+
 
 //get the closest ancestor with the given query
 //arguments: selector
@@ -857,7 +878,7 @@ window.AutoMagicConstructor.prototype.prepend=function () {
         elems=this.js;
     elems.forEach(function(elem, index) {
         if (typeof arg[0] === 'string') {
-            elem.innerHTML = arg[0] + elem.innerHTML;
+            elem.insertAdjacentHTML('afterbegin',arg[0]);
         } else if (elem.childNodes.length > 0) {
             elem.insertBefore(arg[0], elem.firstChild);
         } else {
@@ -935,6 +956,18 @@ window.AutoMagicConstructor.prototype.prop=function () {
         return undefined;
     }
     return this;
+}
+
+//remove element
+//arguments: none
+//--------------------------------
+window.AutoMagicConstructor.prototype.remove=function () {
+    var arg = arguments,
+        elems=this.js;
+    elems.forEach(function(elem, index) {
+        elem.parentNode.removeChild( elem );
+    });
+    return true;
 }
 
 //remove class from the element
