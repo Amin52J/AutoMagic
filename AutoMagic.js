@@ -405,7 +405,7 @@ window.AutoMagicConstructor.prototype.eq=function (){
 window.AutoMagicConstructor.prototype.find=function (){
     var arg=arguments,
         elems=this.js;
-    return am(elems[0].querySelector(arg[0]));
+    return am(elems[0].querySelectorAll(arg[0]));
 } 
     
 //check if element has the selected element
@@ -592,22 +592,24 @@ window.AutoMagicConstructor.prototype.load=function (){
                     var response = req.responseText;
                     if (req.status == 200) {
                         elem.innerHTML=response;
-                        var src=am(elem).js[0].querySelector('script').getAttribute('src');
-                        am(elem).js[0].querySelector('script').parentNode.removeChild(am(elem).js[0].querySelector('script'));
-                        var script = document.createElement('script');
-                        script.type = 'text/javascript';
-                        script.src = src;
-                        script.onreadystatechange = function(){
+                        if(am(elem).js[0].querySelector('script')!=null){
+                            var src=am(elem).js[0].querySelector('script').getAttribute('src');
+                            am(elem).js[0].querySelector('script').parentNode.removeChild(am(elem).js[0].querySelector('script'));
+                            var script = document.createElement('script');
+                            script.type = 'text/javascript';
+                            script.src = src;
+                            script.onload = function(){
+                                if(typeof arg[1]!=='undefined'){
+                                    arg[1]();
+                                }
+                            };
+                            elem.appendChild(script);
+                        }
+                        else{
                             if(typeof arg[1]!=='undefined'){
                                 arg[1]();
                             }
-                        };
-                        script.onload = function(){
-                            if(typeof arg[1]!=='undefined'){
-                                arg[1]();
-                            }
-                        };
-                        elem.appendChild(script);
+                        }
                     } else if (req.status == 400) {
                         am.throwError('Something went wrong!');
                     }
@@ -1013,15 +1015,27 @@ window.AutoMagicConstructor.prototype.scroll=function () {
         elem = this.js[0];
     if (arg.length === 0) {
         return {
-            x: elem.scrollLeft,
-            y: elem.scrollTop
+            x: {
+                position:elem.scrollLeft,
+                length:elem.scrollWidth
+            },
+            y: {
+                position:elem.scrollTop,
+                length:elem.scrollHeight
+            }
         }
     } else if (arg.length === 1) {
         if (typeof arg[0] === 'string') {
             if (arg[0].toLowerCase() === 'x' || arg[0].toLowerCase() === 'left') {
-                return elem.scrollLeft;
+                return {
+                    position:elem.scrollLeft,
+                    length:elem.scrollWidth
+                }
             } else if (arg[0].toLowerCase() === 'y' || arg[0].toLowerCase() === 'top') {
-                return elem.scrollTop;
+                return {
+                    position:elem.scrollTop,
+                    length:elem.scrollHeight
+                }
             } else {
                 return undefined;
             }
@@ -1424,7 +1438,12 @@ window.AutoMagic.throwError = function() {
 window.AutoMagic.trim = function() {
     var arg = arguments,
         regex = new RegExp(/\s/, 'g');
-    return arg[0].replace(regex, '');
+    if(typeof arg[0]==='string'){
+        return arg[0].replace(regex, '');
+    }
+    else{
+        am.throwError('AutoMagic can only trim strings!');
+    }
 
 }
 
