@@ -53,7 +53,7 @@ function scrollTo(to, duration, direction,elem) {
 //arguments: selector
 //-------------cssSelector------------
 window.am = am = AutoMagic = window.AutoMagic=function(selector){
-    var am = new window.AutoMagicConstructor;
+    var am = new window.AutoMagicConstructor();
     am.selector=selector;
     
     var elems;
@@ -74,7 +74,7 @@ window.am = am = AutoMagic = window.AutoMagic=function(selector){
     am.length=elems.length;
     am.js=elems;
     return am;
-}
+};
 
 //************************************************************
 //extending the constructor **********************************---------------------------------------------------------
@@ -94,10 +94,10 @@ window.AutoMagicConstructor.prototype.addClass=function(){
             if (elem.className.indexOf(currentClass) < 0) {
                 elem.className += ' ' + currentClass;
             }
-        };
-    };
+        }
+    }
     return this;
-}
+};
 
 //insert html after the selected element
 //arguments: html
@@ -114,38 +114,42 @@ window.AutoMagicConstructor.prototype.after= function() {
 //---------------object-------------number----string------------
 window.AutoMagicConstructor.prototype.animate= function() {
     var arg = arguments,
-        elems=this.js;
+        elems=this.js,
+        transitionDuration,
+        propArray=[],
+        vendor=[],
+        transitionTimingFunction;
     if (typeof arg[0] !== 'object' || arg.length < 1) {
         am.throwError('SyntaxError: Please specify css values to animate');
     } else {
         if (typeof arg[1] === 'number') {
-            var propArray = [];
+            propArray = [];
             for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-                var vendor=vendors[i];
+                vendor=vendors[i];
                 propArray.push(toCamelCase(vendor + 'transition-duration'));
-            };
-            var transitionDuration = getSupportedProp(propArray);
+            }
+            transitionDuration = getSupportedProp(propArray);
         }
         if (typeof arg[2] === 'string') {
-            var propArray = [];
+            propArray = [];
             for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-                var vendor=vendors[i];
+                vendor=vendors[i];
                 propArray.push(toCamelCase(vendor + 'transition-timing-function'));
-            };
-            var transitionTimingFunction = getSupportedProp(propArray);
+            }
+            transitionTimingFunction = getSupportedProp(propArray);
         }
-        var propArray = [];
+        propArray = [];
         for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-            var vendor=vendors[i];
+            vendor=vendors[i];
             propArray.push(toCamelCase(vendor + 'transition-property'));
-        };
+        }
         var transitionProperty = getSupportedProp(propArray);
 
         for(var index=0, elemLength=elems.length; index < elemLength; index++){
             var elem=elems[index];
             elem.style[transitionProperty] = '';
             var count = 0;
-            for (key in arg[0]) {
+            for (var key in arg[0]) {
                 if (key.indexOf('background') > -1) {
                     key = 'background';
                 }
@@ -193,17 +197,17 @@ window.AutoMagicConstructor.prototype.animate= function() {
             if (typeof arg[2] === 'string') {
                 elem.style[transitionTimingFunction] = arg[2];
             }
-        };
+        }
 
-        var propArray = [],
-            properties = [];
+        var properties = [];
+        propArray = [];
 
-        for (key in arg[0]) {
+        for (var key in arg[0]) {
             propArray = [];
             for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-                var vendor=vendors[i];
+                vendor=vendors[i];
                 propArray.push(toCamelCase(vendor + key));
-            };
+            }
             properties.push({
                 prop: getSupportedProp(propArray),
                 value: arg[0][key]
@@ -230,7 +234,7 @@ window.AutoMagicConstructor.prototype.animate= function() {
         }, arg[1]);
     }
     return this;
-}
+};
 
 //append to element
 //arguments: tobeAppended
@@ -246,7 +250,7 @@ window.AutoMagicConstructor.prototype.append=function() {
         }
     });
     return this;
-}
+};
 
 //get or set attribute
 //arguments: attributeName , value
@@ -263,7 +267,7 @@ window.AutoMagicConstructor.prototype.attr=function() {
         return elem.getAttribute(arg[0]);
     }
     return this;
-}
+};
 
 //insert html before the selected element
 //arguments: html
@@ -297,20 +301,21 @@ window.AutoMagicConstructor.prototype.closest=function () {
 //---------------object-------------
 window.AutoMagicConstructor.prototype.css=function () {
     var arg = arguments,
-        elems=this.js;
+        elems=this.js,
+        propArray = [],
+        properties = [],
+        vendor;
     if (arg.length < 1) {
         am.throwError('SyntaxError: no arguments given');
         return undefined;
     } else if(typeof arg[0] === 'string' && arg.length === 1){
         return window.getComputedStyle(elems[0]).getPropertyValue(arg[0]);
     } else if(typeof arg[0] === 'string' && typeof arg[1] === 'string' && arg.length === 2){
-        var propArray = [],
-        properties;
         propArray = [];
         for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-            var vendor=vendors[i];
+            vendor=vendors[i];
             propArray.push(toCamelCase(vendor + arg[0]));
-        };
+        }
         properties={
             prop: getSupportedProp(propArray),
             value: arg[1]
@@ -324,15 +329,13 @@ window.AutoMagicConstructor.prototype.css=function () {
         });
         return this;
     } else {
-        var propArray = [],
-            properties = [];
 
-        for (key in arg[0]) {
+        for (var key in arg[0]) {
             propArray = [];
-            for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-                var vendor=vendors[i];
+            for(var x=0, vendorsLength2=vendors.length; x < vendorsLength2; x++){
+                vendor=vendors[x];
                 propArray.push(toCamelCase(vendor + key));
-            };
+            }
             properties.push({
                 prop: getSupportedProp(propArray),
                 value: arg[0][key]
@@ -350,7 +353,7 @@ window.AutoMagicConstructor.prototype.css=function () {
         });
     }
     return this;
-}
+};
     
 //get or set the value of the data attribute
 //arguments: dataAttributeName , dataAttributeValue
@@ -372,7 +375,7 @@ window.AutoMagicConstructor.prototype.data=function (){
         return JSON.parse(elem.getAttribute('data-'+arg[0]));
     }
     return this;
-} 
+};
 
 //iterate over elements
 //arguments: callback(element,value)
@@ -383,7 +386,7 @@ window.AutoMagicConstructor.prototype.each=function () {
     elems.forEach(function(elem, index) {
         arg[0].apply(elem, [elem, index]);
     });
-}
+};
     
 //select the given index in the selector
 //arguments: index
@@ -397,7 +400,7 @@ window.AutoMagicConstructor.prototype.eq=function (){
     else{
         return am(elems[arg[0]]);
     }
-}
+};
     
 //find the selector descendent to the selected element
 //arguments: selector
@@ -406,7 +409,7 @@ window.AutoMagicConstructor.prototype.find=function (){
     var arg=arguments,
         elems=this.js;
     return am(elems[0].querySelectorAll(arg[0]));
-} 
+};
     
 //check if element has the selected element
 //arguments: selector
@@ -417,14 +420,14 @@ window.AutoMagicConstructor.prototype.has=function (){
         child=am(arg[0]).js[0];
     if(typeof child==='undefined') return false;
     var node = child.parentNode;
-    while (node != null) {
+    while (node !== null) {
         if (node == elem) {
             return true;
         }
         node = node.parentNode;
     }
     return false;
-}
+};
     
 //check if element has the given class
 //arguments: class
@@ -436,7 +439,7 @@ window.AutoMagicConstructor.prototype.hasClass=function (){
         return (" " + elem.className + " " ).indexOf( " "+arg[0]+" " ) > -1;
     }
     return undefined;
-}
+};
 
 //get the height of an element
 //arguments: value or includeBorder
@@ -456,7 +459,7 @@ window.AutoMagicConstructor.prototype.height=function () {
         });
         return this;
     }
-}
+};
 
 //hide element
 //arguments: delay
@@ -476,7 +479,7 @@ window.AutoMagicConstructor.prototype.hide=function () {
         }, arg[0]);
     }
     return this;
-}
+};
 
 //get or set the the html of the element
 //arguments: html
@@ -490,7 +493,7 @@ window.AutoMagicConstructor.prototype.html=function () {
         elem.innerHTML = arg[0];
         return this;
     }
-}
+};
     
 //to get the index of the selected element in the parent
 //arguments: none
@@ -506,7 +509,7 @@ window.AutoMagicConstructor.prototype.index=function (){
         if (children[i].nodeType===1) num++;
     }
     return -1;
-}
+};
     
 //insert string at the carret position
 //arguments: string
@@ -519,10 +522,10 @@ window.AutoMagicConstructor.prototype.insertAtCaret=function () {
         scrollPos = txtarea.scrollTop,
         strPos = 0,
         br = ((txtarea.selectionStart || txtarea.selectionStart == '0') ? 
-        "ff" : (document.selection ? "ie" : false ) );
+        "ff" : (document.selection ? "ie" : false ) ),
+        range = document.selection.createRange();
     if (br == "ie") { 
         txtarea.focus();
-        var range = document.selection.createRange();
         range.moveStart ('character', -txtarea.value.length);
         strPos = range.text.length;
     }
@@ -534,7 +537,6 @@ window.AutoMagicConstructor.prototype.insertAtCaret=function () {
     strPos = strPos + text.length;
     if (br == "ie") { 
         txtarea.focus();
-        var range = document.selection.createRange();
         range.moveStart ('character', -txtarea.value.length);
         range.moveStart ('character', strPos);
         range.moveEnd ('character', 0);
@@ -547,7 +549,7 @@ window.AutoMagicConstructor.prototype.insertAtCaret=function () {
     }
     txtarea.scrollTop = scrollPos;
     return this;
-}
+};
     
 //check if element is the same as the selector
 //arguments: selector
@@ -571,7 +573,7 @@ window.AutoMagicConstructor.prototype.is=function (){
         return elem===am(arg[0]).js[0];
     }
     return undefined;
-}
+};
     
 //check if the element is loaded or load data into the element
 //arguments: callback or url , callback
@@ -592,7 +594,7 @@ window.AutoMagicConstructor.prototype.load=function (){
                     var response = req.responseText;
                     if (req.status == 200) {
                         elem.innerHTML=response;
-                        if(am(elem).js[0].querySelector('script')!=null){
+                        if(am(elem).js[0].querySelector('script')!==null){
                             var src=am(elem).js[0].querySelector('script').getAttribute('src');
                             am(elem).js[0].querySelector('script').parentNode.removeChild(am(elem).js[0].querySelector('script'));
                             var script = document.createElement('script');
@@ -614,11 +616,11 @@ window.AutoMagicConstructor.prototype.load=function (){
                         am.throwError('Something went wrong!');
                     }
                 }
-            }
+            };
         }
     }
     return this;
-}
+};
 
 //get the next element
 //arguments: selector
@@ -639,7 +641,7 @@ window.AutoMagicConstructor.prototype.next=function () {
     } else {
         return am(currentElement);
     }
-}
+};
 
 //get all the elements after
 //arguments: selector
@@ -669,7 +671,7 @@ window.AutoMagicConstructor.prototype.nextAll=function () {
     } else {
         return am(output);
     }
-}
+};
     
 //exclude the selector from the selected set of elements
 //arguments: selector
@@ -690,7 +692,7 @@ window.AutoMagicConstructor.prototype.not=function (){
         }
     });
     return am(output);
-}
+};
 
 //remove event listener
 //arguments: event , handler(event)
@@ -706,7 +708,7 @@ window.AutoMagicConstructor.prototype.off=function () {
                 for(var i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
                     var obj=elem.handlers[i];
                     elem.removeEventListener(obj.event,obj.handler);
-                };
+                }
                 elem.handlers=[];
             }
         });
@@ -726,7 +728,7 @@ window.AutoMagicConstructor.prototype.off=function () {
                     handler=obj.handler;
                     elem.handlers.splice(i,1);
                 }
-            };
+            }
             if(handler===null){
                 am.throwError('The selected event is not attached.');
                 return undefined;
@@ -744,7 +746,7 @@ window.AutoMagicConstructor.prototype.off=function () {
                     elem.handlers.splice(i,1);
                     foundHandler=true;
                 }
-            };
+            }
             if(foundHandler){
                 elem.removeEventListener(arg[0], arg[1]);
             }
@@ -766,7 +768,7 @@ window.AutoMagicConstructor.prototype.off=function () {
                     elem.handlers.splice(i,1);
                     foundHandler=true;
                 }
-            };
+            }
             if(foundHandler){
                 elem.removeEventListener(arg[0], handler);
             }
@@ -806,13 +808,13 @@ window.AutoMagicConstructor.prototype.offset=function () {
             return {
                 top: am(elem).offset().top - am(relativeTo).offset().top,
                 left: am(elem).offset().left - am(relativeTo).offset().left
-            }
+            };
         } else {
             am.throwError('Illegal Selector: the "relative" element is not an ancestor of the selected element or they are the same.');
             return undefined;
         }
     }
-}
+};
 
 //add event listener
 //arguments: event , targetSelector, callback(event)
@@ -870,7 +872,7 @@ window.AutoMagicConstructor.prototype.parent=function () {
     } else {
         return am(elem.parentNode);
     }
-}
+};
 
 //prepend to element
 //arguments: tobePrepended
@@ -888,7 +890,7 @@ window.AutoMagicConstructor.prototype.prepend=function () {
         }
     });
     return this;
-}
+};
 
 //get the previous element
 //arguments: selector
@@ -909,7 +911,7 @@ window.AutoMagicConstructor.prototype.prev=function () {
     } else {
         return am(currentElement);
     }
-}
+};
 
 //get all the elements before
 //arguments: selector
@@ -939,7 +941,7 @@ window.AutoMagicConstructor.prototype.prevAll=function () {
     } else {
         return am(output);
     }
-}
+};
 
 //get or set property value
 //arguments: property , value
@@ -958,7 +960,7 @@ window.AutoMagicConstructor.prototype.prop=function () {
         return undefined;
     }
     return this;
-}
+};
 
 //remove element
 //arguments: none
@@ -970,7 +972,7 @@ window.AutoMagicConstructor.prototype.remove=function () {
         elem.parentNode.removeChild( elem );
     });
     return true;
-}
+};
 
 //remove class from the element
 //arguments: className
@@ -988,11 +990,11 @@ window.AutoMagicConstructor.prototype.removeClass=function () {
                 if(value===currentClass){
                     elem.className = elem.className.replace(currentClass, '');
                 }
-            };
-        };
+            }
+        }
     });
     return this;
-}
+};
 
 //replace class of the element
 //arguments: tobeReplacedClassName, replacementClassName
@@ -1005,7 +1007,7 @@ window.AutoMagicConstructor.prototype.replaceClass=function () {
         elem.className = elem.className.replace(regex, arg[1]);
     });
     return this;
-}
+};
 
 //get or animate the scroll position
 //arguments: direction , value , duration
@@ -1023,19 +1025,19 @@ window.AutoMagicConstructor.prototype.scroll=function () {
                 position:elem.scrollTop,
                 length:elem.scrollHeight
             }
-        }
+        };
     } else if (arg.length === 1) {
         if (typeof arg[0] === 'string') {
             if (arg[0].toLowerCase() === 'x' || arg[0].toLowerCase() === 'left') {
                 return {
                     position:elem.scrollLeft,
                     length:elem.scrollWidth
-                }
+                };
             } else if (arg[0].toLowerCase() === 'y' || arg[0].toLowerCase() === 'top') {
                 return {
                     position:elem.scrollTop,
                     length:elem.scrollHeight
-                }
+                };
             } else {
                 return undefined;
             }
@@ -1076,7 +1078,7 @@ window.AutoMagicConstructor.prototype.scroll=function () {
         }
     }
     return this;
-}
+};
 
 //show element
 //arguments: delay , display
@@ -1103,7 +1105,7 @@ window.AutoMagicConstructor.prototype.show=function () {
             return undefined;
     }
     return this;
-}
+};
 
 //get the siblings that match the selector
 //arguments: selector
@@ -1127,7 +1129,7 @@ window.AutoMagicConstructor.prototype.siblings=function () {
         });
     }
     return am(output);
-}
+};
 
 //get or set the the text of the element
 //arguments: text
@@ -1141,7 +1143,7 @@ window.AutoMagicConstructor.prototype.text=function () {
         elem.innerText = arg[0];
         return am(this.js[0]);
     }
-}
+};
 
 //to trigger an event on the selected element
 //arguments: eventName
@@ -1166,7 +1168,7 @@ window.AutoMagicConstructor.prototype.trigger=function () {
         elem.fireEvent("on" + event.eventType, event);
     }
     return this;
-}
+};
 
 //get or set the value of the selected element
 //arguments: value
@@ -1180,7 +1182,7 @@ window.AutoMagicConstructor.prototype.val=function () {
     } else {
         return elem.value;
     }
-}
+};
 
 //get the width of an element
 //arguments: value or includeBorder
@@ -1200,7 +1202,7 @@ window.AutoMagicConstructor.prototype.width=function () {
         });
         return this;
     }
-}
+};
 
 //************************************************************
 //end of extending the constructor ***************************---------------------------------------------------------
@@ -1251,14 +1253,14 @@ window.AutoMagic.ajax = function() {
         }
     };
 
+    var data = '',
+        key;
     if (config.stringify && config.method === 'POST') {
-        var data = '';
         for (key in config.data) {
             data += String(key) + '=' + JSON.stringify(config.data[key]) + '&';
         }
         config.data = data;
     } else {
-        var data = '';
         for (key in config.data) {
             data += String(key) + '=' + config.data[key] + '&';
         }
@@ -1284,7 +1286,7 @@ window.AutoMagic.ajax = function() {
     } else {
         xmlhttp.send();
     }
-}
+};
 
 //set, get and remove cookies
 //arguments: name , data , daysToExpire 
@@ -1296,7 +1298,7 @@ window.AutoMagic.cookie=function(){
         if (arg[2]) {
             var date = new Date();
             date.setTime(date.getTime()+(arg[2]*24*60*60*1000));
-            var expires = "; expires="+date.toGMTString();
+            expires = "; expires="+date.toGMTString();
         }
         document.cookie = arg[0]+"="+JSON.stringify(arg[1])+expires+"; path=/";
     }
@@ -1306,11 +1308,11 @@ window.AutoMagic.cookie=function(){
         for(var i=0;i < ca.length;i++) {
             var c = ca[i];
             while (c.charAt(0)==' ') c = c.substring(1,c.length);
-            if (c.indexOf(nameEQ) == 0) return JSON.parse(c.substring(nameEQ.length,c.length));
+            if (c.indexOf(nameEQ) === 0) return JSON.parse(c.substring(nameEQ.length,c.length));
         }
         return null;
     }
-}
+};
 
 //iterate over array or object
 //arguments: currentInstance , callback(value,index)
@@ -1321,7 +1323,7 @@ window.AutoMagic.each = function() {
         arg[0].forEach(arg[1]);
     }
     else if(typeof arg[0]==='object'){
-        for(key in arg[0]){
+        for(var key in arg[0]){
             arg[1].apply(arg[0][key], [key, arg[0][key]]);
         }
     }
@@ -1359,7 +1361,7 @@ window.AutoMagic.ready = function() {
     if(window.AutoMagic.ready.fired){
         arg[0]();
     }
-}
+};
 
 //replace all occurances
 //arguments: targetString , replace , replacement
@@ -1373,7 +1375,7 @@ window.AutoMagic.replaceAll=function(){
         window.AutoMagic.throwError('SyntaxError: three arguments required');
         return undefined;
     }
-}
+};
 
 //push state
 //arguments: multiple scenarios
@@ -1404,7 +1406,7 @@ window.AutoMagic.state={
         };
     },
     elem:''
-}
+};
 
 //get, set or remove localStorage
 //arguments: name , value //empty string to remove
@@ -1422,7 +1424,7 @@ window.AutoMagic.storage = function() {
             return null;
         }
     }
-}
+};
 
 //throw error
 //arguments: text
@@ -1445,7 +1447,7 @@ window.AutoMagic.trim = function() {
         am.throwError('AutoMagic can only trim strings!');
     }
 
-}
+};
 
 //unescape string
 //arguments: string
