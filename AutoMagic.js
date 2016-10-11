@@ -56,7 +56,7 @@ function pushHandler(elem,event,selector,callback){
         event:event,
         handler:function(e) {
             var target = am(e.target).closest(selector);
-            if (target === null) return false;
+            if (target === null) return;
             callback.call(target.js[0], e);
         },
         attachedTo:selector
@@ -86,13 +86,16 @@ window.am = am = AutoMagic = window.AutoMagic=function(selector){
     } else if (typeof selector === 'string') {
         elems = document.querySelectorAll(selector);
     } else {
-        am.throwError('Inalid selector!');
-        return false;
+        am.throwError('Invalid selector!');
+        return undefined;
     }
     am.length=elems.length;
     am.js=elems;
     return am;
 };
+
+//developer mode
+am.devMode=true;
 
 //************************************************************
 //extending the constructor **********************************---------------------------------------------------------
@@ -142,118 +145,114 @@ window.AutoMagicConstructor.prototype.animate= function() {
         key,
         index,
         elem;
-    if (typeof arg[0] !== 'object' || arg.length < 1) {
-        am.throwError('SyntaxError: Please specify css values to animate');
-    } else {
-        if (typeof arg[1] === 'number') {
-            propArray = [];
-            for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-                vendor=vendors[i];
-                propArray.push(toCamelCase(vendor + 'transition-duration'));
-            }
-            transitionDuration = getSupportedProp(propArray);
-        }
-        if (typeof arg[2] === 'string') {
-            propArray = [];
-            for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-                vendor=vendors[i];
-                propArray.push(toCamelCase(vendor + 'transition-timing-function'));
-            }
-            transitionTimingFunction = getSupportedProp(propArray);
-        }
+    if (typeof arg[1] === 'number') {
         propArray = [];
         for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
             vendor=vendors[i];
-            propArray.push(toCamelCase(vendor + 'transition-property'));
+            propArray.push(toCamelCase(vendor + 'transition-duration'));
         }
-        var transitionProperty = getSupportedProp(propArray);
-
-        for(index=0, elemsLength=elems.length; index < elemsLength; index++){
-            elem=elems[index];
-            elem.style[transitionProperty] = '';
-            var count = 0;
-            for (key in arg[0]) {
-                if (key.indexOf('background') > -1) {
-                    key = 'background';
-                }
-                if (key.indexOf('border') > -1) {
-                    key = 'border';
-                }
-                if (key.indexOf('fill') > -1) {
-                    key = 'fill';
-                }
-                if (key.indexOf('flex') > -1) {
-                    key = 'flex';
-                }
-                if (key.indexOf('font') > -1) {
-                    key = 'font';
-                }
-                if (key.indexOf('margin') > -1) {
-                    key = 'margin';
-                }
-                if (key.indexOf('motion') > -1) {
-                    key = 'motion';
-                }
-                if (key.indexOf('outline') > -1) {
-                    key = 'outline';
-                }
-                if (key.indexOf('padding') > -1) {
-                    key = 'padding';
-                }
-                if (key.indexOf('stroke') > -1) {
-                    key = 'stroke';
-                }
-                if (key.indexOf('text') > -1) {
-                    key = 'text';
-                }
-
-                if (count !== 0) {
-                    elem.style[transitionProperty] += ',' + key;
-                } else {
-                    elem.style[transitionProperty] += key;
-                }
-                count++;
-            }
-            if (typeof arg[1] === 'number') {
-                elem.style[transitionDuration] = arg[1] + 'ms';
-            }
-            if (typeof arg[2] === 'string') {
-                elem.style[transitionTimingFunction] = arg[2];
-            }
-        }
-
-        var properties = [];
-        propArray = [];
-
-        for (key in arg[0]) {
-            propArray = [];
-            for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-                vendor=vendors[i];
-                propArray.push(toCamelCase(vendor + key));
-            }
-            properties.push({
-                prop: getSupportedProp(propArray),
-                value: arg[0][key]
-            });
-        }
-
-        var that = this;
-        
-        for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
-            for(i=0, propertiesLength=properties.length, property=properties[i]; i < propertiesLength; i++){
-                var style = window.getComputedStyle(elem);
-                elem.style[property.prop] = style.getPropertyValue(property.prop);
-                setProp(property.prop,property.value);
-            }
-        }
-        setTimeout(function() {
-            if (typeof arg[2] === 'function') {
-                arg[2].call(that.js);
-            } else if (typeof arg[3] === 'function') {
-                arg[3].call(that.js);
-            }
-        }, arg[1]);
+        transitionDuration = getSupportedProp(propArray);
     }
+    if (typeof arg[2] === 'string') {
+        propArray = [];
+        for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+            vendor=vendors[i];
+            propArray.push(toCamelCase(vendor + 'transition-timing-function'));
+        }
+        transitionTimingFunction = getSupportedProp(propArray);
+    }
+    propArray = [];
+    for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+        vendor=vendors[i];
+        propArray.push(toCamelCase(vendor + 'transition-property'));
+    }
+    var transitionProperty = getSupportedProp(propArray);
+
+    for(index=0, elemsLength=elems.length; index < elemsLength; index++){
+        elem=elems[index];
+        elem.style[transitionProperty] = '';
+        var count = 0;
+        for (key in arg[0]) {
+            if (key.indexOf('background') > -1) {
+                key = 'background';
+            }
+            if (key.indexOf('border') > -1) {
+                key = 'border';
+            }
+            if (key.indexOf('fill') > -1) {
+                key = 'fill';
+            }
+            if (key.indexOf('flex') > -1) {
+                key = 'flex';
+            }
+            if (key.indexOf('font') > -1) {
+                key = 'font';
+            }
+            if (key.indexOf('margin') > -1) {
+                key = 'margin';
+            }
+            if (key.indexOf('motion') > -1) {
+                key = 'motion';
+            }
+            if (key.indexOf('outline') > -1) {
+                key = 'outline';
+            }
+            if (key.indexOf('padding') > -1) {
+                key = 'padding';
+            }
+            if (key.indexOf('stroke') > -1) {
+                key = 'stroke';
+            }
+            if (key.indexOf('text') > -1) {
+                key = 'text';
+            }
+
+            if (count !== 0) {
+                elem.style[transitionProperty] += ',' + key;
+            } else {
+                elem.style[transitionProperty] += key;
+            }
+            count++;
+        }
+        if (typeof arg[1] === 'number') {
+            elem.style[transitionDuration] = arg[1] + 'ms';
+        }
+        if (typeof arg[2] === 'string') {
+            elem.style[transitionTimingFunction] = arg[2];
+        }
+    }
+
+    var properties = [];
+    propArray = [];
+
+    for (key in arg[0]) {
+        propArray = [];
+        for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+            vendor=vendors[i];
+            propArray.push(toCamelCase(vendor + key));
+        }
+        properties.push({
+            prop: getSupportedProp(propArray),
+            value: arg[0][key]
+        });
+    }
+
+    var that = this;
+    
+    for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
+        for(i=0, propertiesLength=properties.length, property=properties[i]; i < propertiesLength; i++){
+            var style = window.getComputedStyle(elem);
+            elem.style[property.prop] = style.getPropertyValue(property.prop);
+            setProp(property.prop,property.value);
+        }
+    }
+    setTimeout(function() {
+        if (typeof arg[2] === 'function') {
+            arg[2].call(that.js);
+        } else if (typeof arg[3] === 'function') {
+            arg[3].call(that.js);
+        }
+    }, arg[1]);
     return this;
 };
 
@@ -317,7 +316,7 @@ window.AutoMagicConstructor.prototype.closest=function () {
         }
         elem = elem.parentNode;
     }
-    return (elem.tagName.toLowerCase() == 'html') ? null : am(elem);
+    return (elem.tagName.toLowerCase() == 'html') ? undefined : am(elem);
 };
 
 //set or get a css property
@@ -335,12 +334,10 @@ window.AutoMagicConstructor.prototype.css=function () {
         i,
         vendorsLength,
         style;
-    if (arg.length < 1) {
-        am.throwError('SyntaxError: no arguments given');
-        return undefined;
-    } else if(typeof arg[0] === 'string' && arg.length === 1){
+    if(typeof arg[0] === 'string' && arg.length === 1){
         return window.getComputedStyle(elems[0]).getPropertyValue(arg[0]);
-    } else if(typeof arg[0] === 'string' && typeof arg[1] === 'string' && arg.length === 2){
+    } 
+    else if(typeof arg[0] === 'string' && typeof arg[1] === 'string' && arg.length === 2){
         propArray = [];
         for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
             vendor=vendors[i];
@@ -355,9 +352,7 @@ window.AutoMagicConstructor.prototype.css=function () {
             elem.style[arg[0]] = style.getPropertyValue(properties.prop);
             setProp(properties.prop,properties.value);
         }
-        return this;
     } else {
-
         for (var key in arg[0]) {
             propArray = [];
             for(var x=0, vendorsLength2=vendors.length; x < vendorsLength2; x++){
@@ -423,12 +418,7 @@ window.AutoMagicConstructor.prototype.each=function () {
 window.AutoMagicConstructor.prototype.eq=function (){
     var arg=arguments,
         elems=this.js;
-    if(arg.length===0){
-        return undefined;
-    }
-    else{
-        return am(elems[arg[0]]);
-    }
+    return am(elems[arg[0]]);
 };
     
 //find the selector descendent to the selected element
@@ -464,10 +454,7 @@ window.AutoMagicConstructor.prototype.has=function (){
 window.AutoMagicConstructor.prototype.hasClass=function (){
     var arg=arguments,
         elem=this.js[0];
-    if(arg.length>0){
-        return (" " + elem.className + " " ).indexOf( " "+arg[0]+" " ) > -1;
-    }
-    return undefined;
+    return (" " + elem.className + " " ).indexOf( " "+arg[0]+" " ) > -1;
 };
 
 //get the height of an element
@@ -641,7 +628,7 @@ window.AutoMagicConstructor.prototype.load=function (){
                                 arg[1]();
                             }
                         }
-                    } else if (req.status == 400) {
+                    } else if (req.status == 400 || req.status == 500) {
                         am.throwError('Something went wrong!');
                     }
                 }
@@ -665,8 +652,8 @@ window.AutoMagicConstructor.prototype.next=function () {
         }
     }
     if (currentElement === null) {
-        am.throwError('element not found');
-        return null;
+        am.throwError('Element not found!');
+        return undefined;
     } else {
         return am(currentElement);
     }
@@ -695,8 +682,8 @@ window.AutoMagicConstructor.prototype.nextAll=function () {
         }
     }
     if (output.length < 1) {
-        am.throwError('element not found');
-        return null;
+        am.throwError('Element not found!');
+        return undefined;
     } else {
         return am(output);
     }
@@ -752,7 +739,7 @@ window.AutoMagicConstructor.prototype.off=function () {
         for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             handler=null;
             if(typeof elem.handlers==='undefined'){
-                am.throwError('The selected event is not attached.');
+                am.throwError('The selected event is not bound!');
                 return undefined;
             }
             for(i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
@@ -763,7 +750,7 @@ window.AutoMagicConstructor.prototype.off=function () {
                 }
             }
             if(handler===null){
-                am.throwError('The selected event is not attached.');
+                am.throwError('The selected event is not bound!');
                 return undefined;
             }
             elem.removeEventListener(arg[0],handler);
@@ -782,7 +769,7 @@ window.AutoMagicConstructor.prototype.off=function () {
                 elem.removeEventListener(arg[0], arg[1]);
             }
             else{
-                am.throwError('The selected event is not attached.');
+                am.throwError('The selected event is not bound!');
                 return undefined;
             }
         }
@@ -801,12 +788,12 @@ window.AutoMagicConstructor.prototype.off=function () {
                 elem.removeEventListener(arg[0], handler);
             }
             else{
-                am.throwError('The selected event is not attached.');
+                am.throwError('The selected event is not bound!');
                 return undefined;
             }
         }
     } else {
-        am.throwError('SyntaxError: invalid argument');
+        am.throwError('SyntaxError: Invalid argument/s!');
         return undefined;
     }
     return this;
@@ -854,7 +841,8 @@ window.AutoMagicConstructor.prototype.on=function () {
         elemsLength,
         elem;
     if (arg.length < 2) {
-        return false;
+        am.throwError('SyntaxError: Invalid arguments!');
+        return undefined;
     } else if (arg.length === 2) {
         for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             if(typeof elem.handlers==='undefined'){
@@ -890,7 +878,7 @@ window.AutoMagicConstructor.prototype.parent=function () {
         if (matchesSelector.call(elem, arg[0])) {
             return am(elem.parentNode);
         } else {
-            return false;
+            return undefined;
         }
     } else {
         return am(elem.parentNode);
@@ -929,8 +917,8 @@ window.AutoMagicConstructor.prototype.prev=function () {
         }
     }
     if (currentElement === null) {
-        am.throwError('element not found');
-        return null;
+        am.throwError('Element not found!');
+        return undefined;
     } else {
         return am(currentElement);
     }
@@ -959,8 +947,8 @@ window.AutoMagicConstructor.prototype.prevAll=function () {
         }
     }
     if (output.length < 1) {
-        am.throwError('element not found');
-        return null;
+        am.throwError('Element not found!');
+        return undefined;
     } else {
         return am(output);
     }
@@ -979,7 +967,7 @@ window.AutoMagicConstructor.prototype.prop=function () {
     } else if (arg.length === 1) {
         return elems[0][arg[0]];
     } else {
-        am.throwError('Syntax error: please specify a property as an argument');
+        am.throwError('SyntaxError: Please specify a property!');
         return undefined;
     }
     return this;
@@ -994,7 +982,6 @@ window.AutoMagicConstructor.prototype.remove=function () {
     for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
         elem.parentNode.removeChild( elem );
     }
-    return true;
 };
 
 //remove class from the element
@@ -1064,11 +1051,11 @@ window.AutoMagicConstructor.prototype.scroll=function () {
                 return undefined;
             }
         } else {
-            am.throwError('SyntaxError: Invalid argument');
+            am.throwError('SyntaxError: Invalid argument!');
         }
     } else if (arg.length === 2) {
         if (typeof arg[0] !== 'string' || typeof arg[1] !== 'number') {
-            am.throwError('SyntaxError: Invalid argument');
+            am.throwError('SyntaxError: Invalid argument!');
         } else {
             if (arg[0].toLowerCase() === 'x' || arg[0].toLowerCase() === 'left') {
                 elem.scrollLeft = arg[1];
@@ -1080,7 +1067,7 @@ window.AutoMagicConstructor.prototype.scroll=function () {
         }
     } else {
         if (typeof arg[0] !== 'string' || typeof arg[1] !== 'number' || typeof arg[2] !== 'number') {
-            am.throwError('SyntaxError: Invalid argument');
+            am.throwError('SyntaxError: Invalid argument!');
         } else {
             if (arg[0].toLowerCase() === 'x' || arg[0].toLowerCase() === 'left') {
                 if (arg[2] <= 0) {
@@ -1123,7 +1110,7 @@ window.AutoMagicConstructor.prototype.show=function () {
             }, arg[0]);
             break;
         default:
-            am.throwError('syntaxError: invalid argument');
+            am.throwError('syntaxError: Invalid argument!');
             return undefined;
     }
     return this;
@@ -1335,7 +1322,7 @@ window.AutoMagic.cookie=function(){
             while (c.charAt(0)==' ') c = c.substring(1,c.length);
             if (c.indexOf(nameEQ) === 0) return JSON.parse(c.substring(nameEQ.length,c.length));
         }
-        return null;
+        return undefined;
     }
 };
 
@@ -1399,7 +1386,7 @@ window.AutoMagic.replaceAll=function(){
         return arg[0].split(arg[1]).join(arg[2]);
     }
     else{
-        window.AutoMagic.throwError('SyntaxError: three arguments required');
+        window.AutoMagic.throwError('SyntaxError: Three arguments required!');
         return undefined;
     }
 };
@@ -1445,11 +1432,7 @@ window.AutoMagic.storage = function() {
     } else if (arg.length > 1 && arg[1] === '') {
         window.localStorage.removeItem(arg[0]);
     } else {
-        if (window.localStorage.getItem(arg[0]) !== null) {
-            return JSON.parse(window.localStorage.getItem(arg[0]));
-        } else {
-            return null;
-        }
+        return (window.localStorage.getItem(arg[0]) !== null) ? JSON.parse(window.localStorage.getItem(arg[0])) : undefined;
     }
 };
 
@@ -1458,7 +1441,9 @@ window.AutoMagic.storage = function() {
 //-----------string------------
 window.AutoMagic.throwError = function() {
     var arg = arguments;
-    console.error(arg[0]);
+    if(am.devMode){
+        console.error(arg[0]);
+    }
 };
 
 //trim string
@@ -1470,10 +1455,7 @@ window.AutoMagic.trim = function() {
     if(typeof arg[0]==='string'){
         return arg[0].replace(regex, '');
     }
-    else{
-        am.throwError('AutoMagic can only trim strings!');
-    }
-
+    return undefined;
 };
 
 //unescape string
