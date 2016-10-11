@@ -1,2 +1,2 @@
 # AutoMagic
-A magically fast, lightweight and customisable javascript library. (BETA Version)
+A magically fast, lightweight and customisable javascript library.
