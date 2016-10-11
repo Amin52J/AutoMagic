@@ -1,4 +1,4 @@
-//version 1.0.1
+//version 1.1.0
 
 //defining the constructor
 window.AutoMagicConstructor=function(){
@@ -44,6 +44,24 @@ function scrollTo(to, duration, direction,elem) {
         scrollTo(to, duration - 10, direction,elem);
     }, 10);
 }
+
+function setProp(prop,value){
+    setTimeout(function() {
+        elem.style[prop] = value;
+    }, 10);
+}
+
+function pushHandler(elem,event,selector,callback){
+    elem.handlers.push({
+        event:event,
+        handler:function(e) {
+            var target = am(e.target).closest(selector);
+            if (target === null) return false;
+            callback.call(target.js[0], e);
+        },
+        attachedTo:selector
+    });
+}
 //************************************************************
 //end of global functions ************************************---------------------------------------------------------
 //************************************************************
@@ -86,7 +104,7 @@ window.am = am = AutoMagic = window.AutoMagic=function(selector){
 window.AutoMagicConstructor.prototype.addClass=function(){
     var arg = arguments,
         elems=this.js;
-    for(var index=0, elemLength=elems.length; index < elemLength; index++){
+    for(var index=0, elemsLength=elems.length; index < elemsLength; index++){
         var elem=elems[index],
             classArray = arg[0].split(' ');
         for(var ind=0, classLength=classArray.length; ind < classLength; ind++){
@@ -118,13 +136,18 @@ window.AutoMagicConstructor.prototype.animate= function() {
         transitionDuration,
         propArray=[],
         vendor=[],
-        transitionTimingFunction;
+        transitionTimingFunction,
+        i,
+        vendorsLength,
+        key,
+        index,
+        elem;
     if (typeof arg[0] !== 'object' || arg.length < 1) {
         am.throwError('SyntaxError: Please specify css values to animate');
     } else {
         if (typeof arg[1] === 'number') {
             propArray = [];
-            for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+            for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
                 vendor=vendors[i];
                 propArray.push(toCamelCase(vendor + 'transition-duration'));
             }
@@ -132,24 +155,24 @@ window.AutoMagicConstructor.prototype.animate= function() {
         }
         if (typeof arg[2] === 'string') {
             propArray = [];
-            for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+            for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
                 vendor=vendors[i];
                 propArray.push(toCamelCase(vendor + 'transition-timing-function'));
             }
             transitionTimingFunction = getSupportedProp(propArray);
         }
         propArray = [];
-        for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+        for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
             vendor=vendors[i];
             propArray.push(toCamelCase(vendor + 'transition-property'));
         }
         var transitionProperty = getSupportedProp(propArray);
 
-        for(var index=0, elemLength=elems.length; index < elemLength; index++){
-            var elem=elems[index];
+        for(index=0, elemsLength=elems.length; index < elemsLength; index++){
+            elem=elems[index];
             elem.style[transitionProperty] = '';
             var count = 0;
-            for (var key in arg[0]) {
+            for (key in arg[0]) {
                 if (key.indexOf('background') > -1) {
                     key = 'background';
                 }
@@ -202,9 +225,9 @@ window.AutoMagicConstructor.prototype.animate= function() {
         var properties = [];
         propArray = [];
 
-        for (var key in arg[0]) {
+        for (key in arg[0]) {
             propArray = [];
-            for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+            for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
                 vendor=vendors[i];
                 propArray.push(toCamelCase(vendor + key));
             }
@@ -216,15 +239,13 @@ window.AutoMagicConstructor.prototype.animate= function() {
 
         var that = this;
         
-        elems.forEach(function(elem, index) {
-            properties.forEach(function(property) {
+        for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
+            for(i=0, propertiesLength=properties.length, property=properties[i]; i < propertiesLength; i++){
                 var style = window.getComputedStyle(elem);
                 elem.style[property.prop] = style.getPropertyValue(property.prop);
-                setTimeout(function() {
-                    elem.style[property.prop] = property.value;
-                }, 10);
-            });
-        });
+                setProp(property.prop,property.value);
+            }
+        }
         setTimeout(function() {
             if (typeof arg[2] === 'function') {
                 arg[2].call(that.js);
@@ -242,13 +263,13 @@ window.AutoMagicConstructor.prototype.animate= function() {
 window.AutoMagicConstructor.prototype.append=function() {
     var arg = arguments,
         elems=this.js;
-    elems.forEach(function(elem, index) {
+    for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
         if (typeof arg[0] === 'string') {
             elem.insertAdjacentHTML('beforeend',arg[0]);
         } else {
             elem.appendChild(arg[0]);
         }
-    });
+    }
     return this;
 };
 
@@ -257,13 +278,16 @@ window.AutoMagicConstructor.prototype.append=function() {
 //--------------string-------string-----------
 window.AutoMagicConstructor.prototype.attr=function() {
     var arg = arguments,
-        elems=this.js;
+        elems=this.js,
+        elem,
+        index,
+        elemsLength;
     if (arg.length > 1) {
-        elems.forEach(function(elem, index) {
+        for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             elem.setAttribute(arg[0],arg[1]);
-        });
+        }
     } else {
-        var elem = elems[0];
+        elem = elems[0];
         return elem.getAttribute(arg[0]);
     }
     return this;
@@ -304,7 +328,13 @@ window.AutoMagicConstructor.prototype.css=function () {
         elems=this.js,
         propArray = [],
         properties = [],
-        vendor;
+        vendor,
+        index,
+        elemsLength,
+        elem,
+        i,
+        vendorsLength,
+        style;
     if (arg.length < 1) {
         am.throwError('SyntaxError: no arguments given');
         return undefined;
@@ -312,7 +342,7 @@ window.AutoMagicConstructor.prototype.css=function () {
         return window.getComputedStyle(elems[0]).getPropertyValue(arg[0]);
     } else if(typeof arg[0] === 'string' && typeof arg[1] === 'string' && arg.length === 2){
         propArray = [];
-        for(var i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
+        for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
             vendor=vendors[i];
             propArray.push(toCamelCase(vendor + arg[0]));
         }
@@ -320,13 +350,11 @@ window.AutoMagicConstructor.prototype.css=function () {
             prop: getSupportedProp(propArray),
             value: arg[1]
         };
-        elems.forEach(function(elem, index) {
-            var style = window.getComputedStyle(elem);
+        for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
+            style = window.getComputedStyle(elem);
             elem.style[arg[0]] = style.getPropertyValue(properties.prop);
-            setTimeout(function() {
-                elem.style[properties.prop] = properties.value;
-            }, 10);
-        });
+            setProp(properties.prop,properties.value);
+        }
         return this;
     } else {
 
@@ -342,15 +370,13 @@ window.AutoMagicConstructor.prototype.css=function () {
             });
         }
 
-        elems.forEach(function(elem, index) {
-            properties.forEach(function(property) {
-                var style = window.getComputedStyle(elem);
+        for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
+            for(i=0, propertiesLength=properties.length, property=properties[i]; i < propertiesLength; i++){
+                style = window.getComputedStyle(elem);
                 elem.style[property.prop] = style.getPropertyValue(property.prop);
-                setTimeout(function() {
-                    elem.style[property.prop] = property.value;
-                }, 10);
-            });
-        });
+                setProp(properties.prop,properties.value);
+            }
+        }
     }
     return this;
 };
@@ -360,13 +386,16 @@ window.AutoMagicConstructor.prototype.css=function () {
 //--------------string----------------any-----------------
 window.AutoMagicConstructor.prototype.data=function (){
     var arg = arguments,
-        elems=this.js;
+        elems=this.js,
+        elem,
+        index,
+        elemsLength;
     if (arg.length > 1) {
-        elems.forEach(function(elem, index) {
+        for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             elem.setAttribute('data-'+arg[0],JSON.stringify(arg[1]));
-        });
+        }
     } else {
-        var elem = elems[0];
+        elem = elems[0];
         try {
             JSON.parse(elem.getAttribute('data-'+arg[0]));
         } catch (e) {
@@ -383,9 +412,9 @@ window.AutoMagicConstructor.prototype.data=function (){
 window.AutoMagicConstructor.prototype.each=function () {
     var arg = arguments,
         elems=this.js;
-    elems.forEach(function(elem, index) {
+    for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
         arg[0].apply(elem, [elem, index]);
-    });
+    }
 };
     
 //select the given index in the selector
@@ -454,9 +483,9 @@ window.AutoMagicConstructor.prototype.height=function () {
     } else if (typeof arg[0] === 'boolean' && arg[0]===false) {
         return elems[0].clientHeight;
     } else if (typeof arg[0] === 'number') {
-        elems.forEach(function(elem, index) {
+        for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             elem.style.height = arg[0] + 'px';
-        });
+        }
         return this;
     }
 };
@@ -468,14 +497,14 @@ window.AutoMagicConstructor.prototype.hide=function () {
     var arg = arguments,
         elems=this.js;
     if (arg.length === 0) {
-        elems.forEach(function(elem, index) {
+        for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             elem.style.display = 'none';
-        });
+        }
     } else {
         setTimeout(function() {
-            elems.forEach(function(elem, index) {
+            for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
                 elem.style.display = 'none';
-            });
+            }
         }, arg[0]);
     }
     return this;
@@ -680,17 +709,17 @@ window.AutoMagicConstructor.prototype.not=function (){
     var arg=arguments,
         output=[],
         elems=this.js;
-    elems.forEach(function(elem,index){
+    for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
         var isNot=true;
-        am(arg[0]).js.forEach(function(notElem,index){
+        for(var i=0, notElemsLength=am(arg[0]).js.length, notElem=am(arg[0]).js[index]; i < notElemsLength; i++){
             if(elem===notElem){
                 isNot=false;
             }
-        });
+        }
         if(isNot){
             output.push(elem);
         }
-    });
+    }
     return am(output);
 };
 
@@ -699,31 +728,35 @@ window.AutoMagicConstructor.prototype.not=function (){
 //----------string-----function---------
 window.AutoMagicConstructor.prototype.off=function () {
     var arg = arguments,
-        elems=this.js;
+        elems=this.js,
+        index,
+        elemsLength,
+        elem,
+        i,
+        handlersLength,
+        obj,
+        foundHandler,
+        handler;
     if(arg.length===0){
-        elems.forEach(function(elem, index) {
+        for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             if(typeof elem.handlers!=='undefined'){
-                //before change
-                // elem.handlers.forEach(function(obj,i){
-                for(var i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
-                    var obj=elem.handlers[i];
+                for(i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
+                    obj=elem.handlers[i];
                     elem.removeEventListener(obj.event,obj.handler);
                 }
                 elem.handlers=[];
             }
-        });
+        }
     }
     else if (arg.length ===1 && typeof arg[0]==='string') {
-        elems.forEach(function(elem, index) {
-            var handler=null;
+        for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
+            handler=null;
             if(typeof elem.handlers==='undefined'){
                 am.throwError('The selected event is not attached.');
                 return undefined;
             }
-            //before change
-            // elem.handlers.forEach(function(obj,i){
-            for(var i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
-                var obj=elem.handlers[i];
+            for(i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
+                obj=elem.handlers[i];
                 if(obj.event===arg[0]){
                     handler=obj.handler;
                     elem.handlers.splice(i,1);
@@ -734,14 +767,12 @@ window.AutoMagicConstructor.prototype.off=function () {
                 return undefined;
             }
             elem.removeEventListener(arg[0],handler);
-        });
+        }
     } else if (arg.length === 2 && typeof arg[0]==='string' && typeof arg[1]==='function') {
-        elems.forEach(function(elem, index) {
-            var foundHandler=false;
-            //before change
-            // elem.handlers.forEach(function(obj,i){
-            for(var i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
-                var obj=elem.handlers[i];
+        for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
+            foundHandler=false;
+            for(i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
+                obj=elem.handlers[i];
                 if(obj.event===arg[0] && obj.handler.toString()===arg[1].toString()){
                     elem.handlers.splice(i,1);
                     foundHandler=true;
@@ -754,15 +785,12 @@ window.AutoMagicConstructor.prototype.off=function () {
                 am.throwError('The selected event is not attached.');
                 return undefined;
             }
-        });
+        }
     } else if (arg.length === 2 && typeof arg[0]==='string' && typeof arg[1]==='string') {
-        elems.forEach(function(elem, index) {
-            var foundHandler=false,
-                handler;
-            //before change
-            // elem.handlers.forEach(function(obj,i){
-            for(var i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
-                var obj=elem.handlers[i];
+        for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
+            foundHandler=false;
+            for(i=0, handlersLength=elem.handlers.length; i < handlersLength; i++){
+                obj=elem.handlers[i];
                 if(obj.event===arg[0] && obj.attachedTo===arg[1]){
                     handler=obj.handler;
                     elem.handlers.splice(i,1);
@@ -776,7 +804,7 @@ window.AutoMagicConstructor.prototype.off=function () {
                 am.throwError('The selected event is not attached.');
                 return undefined;
             }
-        });
+        }
     } else {
         am.throwError('SyntaxError: invalid argument');
         return undefined;
@@ -821,11 +849,14 @@ window.AutoMagicConstructor.prototype.offset=function () {
 //----------string-------string--------function---------
 window.AutoMagicConstructor.prototype.on=function () {
     var arg = arguments,
-        elems=this.js;
+        elems=this.js,
+        index,
+        elemsLength,
+        elem;
     if (arg.length < 2) {
         return false;
     } else if (arg.length === 2) {
-        elems.forEach(function(elem, index) {
+        for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             if(typeof elem.handlers==='undefined'){
                 elem.handlers=[];
             }
@@ -835,23 +866,15 @@ window.AutoMagicConstructor.prototype.on=function () {
                 attachedTo:''
             });
             elem.addEventListener(arg[0], arg[1]);
-        });
+        }
     } else {
-        elems.forEach(function(elem, index) {
+        for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             if(typeof elem.handlers==='undefined'){
                 elem.handlers=[];
             }
-            elem.handlers.push({
-                event:arg[0],
-                handler:function(event) {
-                    var target = window.AutoMagic(event.target).closest(arg[1]);
-                    if (target === null) return false;
-                    arg[2].call(target.js[0], event);
-                },
-                attachedTo:arg[1]
-            });
+            pushHandler(elem,arg[0],arg[1],arg[2]);
             elem.addEventListener(arg[0], elem.handlers[elem.handlers.length-1].handler,true);
-        });
+        }
     }
     return this;
 };
@@ -880,7 +903,7 @@ window.AutoMagicConstructor.prototype.parent=function () {
 window.AutoMagicConstructor.prototype.prepend=function () {
     var arg = arguments,
         elems=this.js;
-    elems.forEach(function(elem, index) {
+    for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
         if (typeof arg[0] === 'string') {
             elem.insertAdjacentHTML('afterbegin',arg[0]);
         } else if (elem.childNodes.length > 0) {
@@ -888,7 +911,7 @@ window.AutoMagicConstructor.prototype.prepend=function () {
         } else {
             elem.appendChild(arg[0]);
         }
-    });
+    }
     return this;
 };
 
@@ -950,9 +973,9 @@ window.AutoMagicConstructor.prototype.prop=function () {
     var arg = arguments,
         elems=this.js;
     if (arg.length > 1) {
-        elems.forEach(function(elem, index) {
+        for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             elem[arg[0]] = arg[1];
-        });
+        }
     } else if (arg.length === 1) {
         return elems[0][arg[0]];
     } else {
@@ -968,9 +991,9 @@ window.AutoMagicConstructor.prototype.prop=function () {
 window.AutoMagicConstructor.prototype.remove=function () {
     var arg = arguments,
         elems=this.js;
-    elems.forEach(function(elem, index) {
+    for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
         elem.parentNode.removeChild( elem );
-    });
+    }
     return true;
 };
 
@@ -980,7 +1003,7 @@ window.AutoMagicConstructor.prototype.remove=function () {
 window.AutoMagicConstructor.prototype.removeClass=function () {
     var arg = arguments,
         elems=this.js;
-    elems.forEach(function(elem, index) {
+    for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
         var classArray = arg[0].split(' ');
         for(var ind=0, classLength=classArray.length; ind < classLength; ind++){
             var currentClass=classArray[ind];
@@ -992,7 +1015,7 @@ window.AutoMagicConstructor.prototype.removeClass=function () {
                 }
             }
         }
-    });
+    }
     return this;
 };
 
@@ -1002,10 +1025,9 @@ window.AutoMagicConstructor.prototype.removeClass=function () {
 window.AutoMagicConstructor.prototype.replaceClass=function () {
     var arg = arguments,
         elems=this.js;
-    elems.forEach(function(elem, index) {
-        var regex = new RegExp(arg[0], 'g');
-        elem.className = elem.className.replace(regex, arg[1]);
-    });
+    for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
+        elem.className = elem.className.split(arg[0]).join(arg[1]);
+    }
     return this;
 };
 
@@ -1089,15 +1111,15 @@ window.AutoMagicConstructor.prototype.show=function () {
     switch (typeof arg[0]) {
         case 'undefined':
         case 'string':
-            elems.forEach(function(elem, index) {
+            for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
                 elem.style.display = arg[0] || 'initial';
-            });
+            }
             break;
         case 'number':
             setTimeout(function() {
-                elems.forEach(function(elem, index) {
+                for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
                     elem.style.display = arg[1] || 'initial';
-                });
+                }
             }, arg[0]);
             break;
         default:
@@ -1113,20 +1135,23 @@ window.AutoMagicConstructor.prototype.show=function () {
 window.AutoMagicConstructor.prototype.siblings=function () {
     var arg = arguments,
         elem = this.js[0],
-        output = [];
+        output = [],
+        i,
+        nodeLength,
+        v;
     if (arg.length > 0) {
         var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
-        elem.parentNode.childNodes.forEach(function(v, i) {
+        for(i=0, nodeLength=elem.parentNode.childNodes.length, v=elem.parentNode.childNodes[i]; i < nodeLength; i++){
             if (v !== elem && v.nodeType === 1 && matchesSelector.call(v, arg[0])) {
                 output.push(v);
             }
-        });
+        }
     } else {
-        elem.parentNode.childNodes.forEach(function(v, i) {
+        for(i=0, nodeLength=elem.parentNode.childNodes.length, v=elem.parentNode.childNodes[i]; i < nodeLength; i++){
             if (v !== elem && v.nodeType === 1) {
                 output.push(v);
             }
-        });
+        }
     }
     return am(output);
 };
@@ -1197,9 +1222,9 @@ window.AutoMagicConstructor.prototype.width=function () {
     } else if (typeof arg[0] === 'boolean' && arg[0]===false) {
         return elems[0].clientWidth;
     } else if (typeof arg[0] === 'number') {
-        elems.forEach(function(elem, index) {
+        for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             elem.style.width = arg[0] + 'px';
-        });
+        }
         return this;
     }
 };
@@ -1276,9 +1301,9 @@ window.AutoMagic.ajax = function() {
     xmlhttp.timeout = config.timeout;
     xmlhttp.setRequestHeader('Content-Type', config.contentType);
     if (config.headers.length !== undefined) {
-        config.headers.forEach(function(key, value) {
-            xmlhttp.setRequestHeader(key, value);
-        });
+        for(key in config.headers){
+            xmlhttp.setRequestHeader(key, config.headers[key]);
+        }
     }
     config.beforeSend();
     if (config.method === 'POST') {
@@ -1320,7 +1345,9 @@ window.AutoMagic.cookie=function(){
 window.AutoMagic.each = function() {
     var arg = arguments;
     if(Object.prototype.toString.call(arg[0]) === '[object Array]'){
-        arg[0].forEach(arg[1]);
+        for(var index=0, paramLength=arg[0].length, param=arg[0][index]; index < paramLength; index++){
+            arg[1].apply(param,[param,index]);
+        }
     }
     else if(typeof arg[0]==='object'){
         for(var key in arg[0]){
