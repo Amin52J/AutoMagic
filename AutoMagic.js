@@ -1109,7 +1109,7 @@ window.AutoMagicConstructor.prototype.show=function () {
             }, arg[0]);
             break;
         default:
-            am.throwError('syntaxError: Invalid argument!');
+            am.throwError('SyntaxError: Invalid argument!');
             return undefined;
     }
     return this;
@@ -1154,6 +1154,33 @@ window.AutoMagicConstructor.prototype.text=function () {
         elem.innerText = arg[0];
         return am(this.js[0]);
     }
+};
+
+//to toggle the class
+//arguments: className
+//------------string-----------------
+window.AutoMagicConstructor.prototype.toggleClass=function(){
+    var arg = arguments,
+        elems=this.js;
+    for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
+        var classArray = arg[0].split(' ');
+        for(var ind=0, classLength=classArray.length; ind < classLength; ind++){
+            var currentClass=classArray[ind];
+            if (elem.className.indexOf(currentClass) < 0) {
+                elem.className += ' ' + currentClass;
+            }
+            else{
+                var classes=elem.className.split(' ');
+                for(var i=0, classesLength=classes.length; i < classesLength; i++){
+                    var value=classes[i];
+                    if(value===currentClass){
+                        elem.className = elem.className.replace(currentClass, '');
+                    }
+                }
+            }
+        }
+    }
+    return this;
 };
 
 //to trigger an event on the selected element
@@ -1236,11 +1263,11 @@ window.AutoMagic.ajax = function() {
             contentType: arg[0].contentType || 'application/x-www-form-urlencoded; charset=UTF-8',
             data: arg[0].data || '',
             dataType: arg[0].dataType || 'text',
-            stringify: arg[0].stringify || false,
             error: arg[0].error || function() {},
             fail: arg[0].fail || function() {},
             headers: arg[0].headers || {},
             method: arg[0].method || 'POST',
+            stringify: arg[0].stringify || false,
             success: arg[0].success || function() {},
             timeout: arg[0].timeout || 0,
             url: arg[0].url || '/'
