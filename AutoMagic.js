@@ -302,7 +302,6 @@ window.AutoMagicConstructor.prototype.before= function() {
     return am(elem);
 };
 
-
 //get the closest ancestor with the given query
 //arguments: selector
 //----------- string -------------
@@ -1252,7 +1251,12 @@ window.AutoMagic.ajax = function() {
         if (xmlhttp.readyState == XMLHttpRequest.DONE) {
             var response = xmlhttp.responseText;
             if (config.dataType === 'json') {
-                response = JSON.parse(xmlhttp.responseText);
+                try{
+                    response = JSON.parse(xmlhttp.responseText);
+                }
+                catch(err){
+                        response = response;
+                }
             }
             config.complete(response);
             if (xmlhttp.status == 200) {
