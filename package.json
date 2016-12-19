@@ -1,0 +1,29 @@
+{
+  "name": "automagic",
+  "version": "1.0.0",
+  "description": "A magically fast, lightweight and customizable Javascript library.",
+  "main": "AutoMagic.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Amin52J/AutoMagic.git"
+  },
+  "keywords": [
+    "automagic",
+    "javascript",
+    "js",
+    "library",
+    "customizable",
+    "fast",
+    "high",
+    "performance"
+  ],
+  "author": "Amin Jafari",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Amin52J/AutoMagic/issues"
+  },
+  "homepage": "https://github.com/Amin52J/AutoMagic#readme"
+}
