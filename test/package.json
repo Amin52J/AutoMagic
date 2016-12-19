@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "jsdom": "9.9.1",
+    "jsdom-global": "2.1.0"
+  }
+}

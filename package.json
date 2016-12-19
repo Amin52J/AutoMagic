@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/Amin52J/AutoMagic/issues"
   },
-  "homepage": "http://A-Jafari.com/Projects/AutoMagic"
+  "homepage": "http://A-Jafari.com/Projects/AutoMagic",
+  "devDependencies": {
+    "chai": "^3.5.0"
+  }
 }
