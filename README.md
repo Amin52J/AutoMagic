@@ -16,6 +16,10 @@ AutoMagic supports all modern browsers plus IE9+
 
 ### How to start?
 
+You can use the **npm** to install AutoMagic, simply run the command `npm install automagic`
+
+OR
+
 You can [download the complete package](http://a-jafari.com/Files/AutoMagic.zip) or customize your own library [here](http://a-jafari.com/Projects/AutoMagic).
 
 ## Documentation
