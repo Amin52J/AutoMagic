@@ -365,10 +365,11 @@ window.AutoMagicConstructor.prototype.css=function () {
         }
 
         for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
-            for(i=0, propertiesLength=properties.length, property=properties[i]; i < propertiesLength; i++){
+            for(i=0, propertiesLength=properties.length; i < propertiesLength; i++){
+                property=properties[i];
                 style = window.getComputedStyle(elem);
                 elem.style[property.prop] = style.getPropertyValue(property.prop);
-                setProp(properties.prop,properties.value);
+                setProp(property.prop,property.value);
             }
         }
     }
