@@ -334,7 +334,6 @@ window.AutoMagicConstructor.prototype.css=function () {
         vendorsLength,
         style;
     if(typeof arg[0] === 'string' && arg.length === 1){
-        conso(window.getComputedStyle(elems[0]).getPropertyValue(arg[0]));
         return window.getComputedStyle(elems[0]).getPropertyValue(arg[0]);
     } 
     else if(typeof arg[0] === 'string' && typeof arg[1] === 'string' && arg.length === 2){
@@ -533,47 +532,19 @@ window.AutoMagicConstructor.prototype.index=function (){
 window.AutoMagicConstructor.prototype.insertAtCaret=function () {
     var arg=arguments,
         elems=this.js,
-        text=arg[0],
         txtarea = elems[0],
         scrollPos = txtarea.scrollTop,
-        strPos = 0,
-        br = ((txtarea.selectionStart || txtarea.selectionStart == '0') ?
-        "ff" : (document.selection ? "ie" : false ) ),
-        range = document.selection.createRange();
-    if (br == "ie") {
-        txtarea.focus();
-        range.moveStart ('character', -txtarea.value.length);
-        strPos = range.text.length;
-    }
-    else if (br == "ff") strPos = txtarea.selectionStart;
+        caretPos = txtarea.selectionStart;
 
-    var front = (txtarea.value).substring(0,strPos);
-    var back = (txtarea.value).substring(strPos,txtarea.value.length);
-    txtarea.value=front+text+back;
-    strPos = strPos + text.length;
-    if (br == "ie") {
-        txtarea.focus();
-        range.moveStart ('character', -txtarea.value.length);
-        range.moveStart ('character', strPos);
-        range.moveEnd ('character', 0);
-        range.select();
-    }
-    else if (br == "ff") {
-        txtarea.selectionStart = strPos;
-        txtarea.selectionEnd = strPos;
-        txtarea.focus();
-    }
+    var front = (txtarea.value).substring(0, caretPos);
+    var back = (txtarea.value).substring(txtarea.selectionEnd, txtarea.value.length);
+    txtarea.value = front + arg[0] + back;
+    caretPos = caretPos + arg[0].length;
+    txtarea.selectionStart = caretPos;
+    txtarea.selectionEnd = caretPos;
+    txtarea.focus();
     txtarea.scrollTop = scrollPos;
     return this;
-
-    /* http://stackoverflow.com/questions/22935320/uncaught-indexsizeerror-failed-to-execute-getrangeat-on-selection-0-is-not
-    var sel = window.getSelection && window.getSelection();
-    if (sel) {
-        var range = sel.getRangeAt(0); // error here
-        var node = document.createTextNode(text);
-        range.deleteContents();
-        range.insertNode(node);
-    }*/
 };
     
 //check if element is the same as the selector
