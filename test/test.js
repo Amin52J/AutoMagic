@@ -200,3 +200,198 @@ describe('on', function () {
         am('input').trigger('test');
     });
 });
+
+describe('parent', function () {
+    it('Selects the parent element of the selected element.', function () {
+        expect(am('#mocha').parent().js[0]).to.equal(am('body').js[0]);
+    });
+});
+
+describe('prepend', function () {
+    it('Prepends the given html code/DOM to the selected elements.', function () {
+        am('.before').prepend('<div class="prepend"></div>');
+        expect(am('.prepend').length).to.equal(1);
+    });
+});
+
+describe('prev', function () {
+    it('Selects the selected element\'s previous element matched with the given selector.', function () {
+        expect(am('#mocha-report').prev().js[0]).to.equal(am('#mocha-stats').js[0]);
+    });
+});
+
+describe('prevAll', function () {
+    it('Selects all the elements matched with the given selector which are placed before the selected element.', function () {
+        expect(am('li.suite:last-child').prevAll('.suite').length).to.equal(31);
+    });
+});
+
+describe('prop', function () {
+    it('Gets or sets the value of the given property of the selected element/s.', function () {
+        expect(am('#mocha').prop('id')).to.equal('mocha');
+    });
+});
+
+describe('remove', function () {
+    it('Removes the selected elements.', function () {
+        am('a.append').remove();
+        expect(am('.append').length).to.equal(0);
+    });
+});
+
+describe('removeClass', function () {
+    it('Removes the given class from the selected elements.', function () {
+        am('.closest').removeClass('closest');
+        expect(am('.closest').length).to.equal(0);
+    });
+});
+
+describe('replaceClass', function () {
+    it('Replaces the given class with the target class on the selected elements.', function () {
+        am('.before').replaceClass('before','replaced');
+        expect(am('.replaced').length).to.equal(1);
+    });
+});
+
+describe('scroll', function () {
+    it('Scrolls the element to the target point or gets the scrolls positions and lengths. It can animate the scroll if duration is present.', function () {
+        am('body').scroll('top',100);
+        expect(am('body').scroll('top').position).to.equal(100);
+    });
+});
+
+describe('show', function () {
+    it('Sets the display of the selected element as initial or the given value.', function () {
+        am('input').show('block');
+        expect(am('input').css('display')).to.equal('block');
+    });
+});
+
+describe('siblings', function () {
+    it('Selects the siblings of the selected element matched with the given selector.', function () {
+        expect(am('input').siblings('p').length).to.equal(2);
+    });
+});
+
+describe('text', function () {
+    it('Gets or sets the text of the selected element.', function () {
+        am('.prepend').text('test');
+        expect(am('.prepend').text()).to.equal('test');
+    });
+});
+
+describe('toggleClass', function () {
+    it('Adds or removes the class depending on the existence of the class name on the selected elements.', function () {
+        am('.replaced').toggleClass('before');
+        expect(am('.replaced').hasClass('before')).to.equal(true);
+    });
+});
+
+describe('trigger', function () {
+    it('Fires the given event on the selected element.', function (done) {
+        this.timeout=500;
+        am('#mocha').on('test',function () {
+            done();
+        });
+        am('#mocha').trigger('test');
+    });
+});
+
+describe('val', function () {
+    it('Gets or sets the value of the selected element.', function () {
+        am('input').val('test');
+        expect(am('input').val()).to.equal('test');
+    });
+});
+
+describe('width', function () {
+    it('Gets or sets the width of the selected element.', function () {
+        am('input').width(100);
+        expect(am('input').width(true)).to.equal(100);
+    });
+});
+
+describe('ajax', function () {
+    it('Sends an XMLHttpRequest.', function (done) {
+        am.ajax({
+            url:'../',
+            method:'GET',
+            success:function () {
+                done();
+            }
+        });
+    });
+});
+
+describe('cookie', function () {
+    it('Gets, sets or removes a cookie. In order to remove the cookie give the data as an empty string and daysToExpire as -1.', function () {
+        am.cookie('test','test');
+        expect(am.cookie('test')).to.equal('test');
+    });
+});
+
+describe('each', function () {
+    it('Iterates over objects and arrays.', function () {
+        var sum=0,
+            arr=[1,2,3];
+        am.each(arr,function (val) {
+            sum+=val;
+        });
+        expect(sum).to.equal(6);
+    });
+});
+
+describe('escapeString', function () {
+    it('Escapes all the special characters in the given text.', function () {
+        expect(am.escapeString('&<>"\'/\\')).to.equal('&amp;&lt;&gt;&quot;&#39;&#x2F;&#x5C;');
+    });
+});
+
+describe('ready', function () {
+    it('Calls the callback when the document is loaded.', function (done) {
+        am.ready(function () {
+            done();
+        });
+    });
+});
+
+describe('ready', function () {
+    it('Calls the callback when the document is loaded.', function (done) {
+        am.ready(function () {
+            done();
+        });
+    });
+});
+
+describe('replaceAll', function () {
+    it('Replaces all the occurrences of the given value in the string with the replacement string.', function () {
+        expect(am.replaceAll('test','t','b')).to.equal('besb');
+    });
+});
+
+describe('state', function () {
+    it('Watches an element, pushes and updates its value on location change. Set the selector to body if you want the whole page to change on route change.', function () {
+        am.state.watch('#mocha');
+        am.state.push();
+        expect(window.history.state.content).to.equal(am('#mocha').html());
+    });
+});
+
+describe('storage', function () {
+    it('Gets, sets or removes the given local storage. Use empty string as value to remove.', function () {
+        am.storage('test','test');
+        expect(am.storage('test')).to.equal('test');
+    });
+});
+
+describe('trim', function () {
+    it('Removes all the spaces in the given string.', function () {
+        expect(am.trim(' t e s t ')).to.equal('test');
+    });
+});
+
+describe('unescapeString', function () {
+    it('Unescapes all the special characters in the given text.', function () {
+        expect(am.unescapeString('&amp;&lt;&gt;&quot;&#39;&#x2F;&#x5C;')).to.equal('&<>"\'/\\');
+    });
+});

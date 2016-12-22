@@ -67,20 +67,20 @@ For the ease of use for the developers who've already used other libraries, all 
 * **show** - Sets the display of the selected element as initial or the given value.
 * **siblings** - Selects the siblings of the selected element matched with the given selector.
 * **text** - Gets or sets the text of the selected element.
-* **toggleClass** - Add or remove the class depending on the existance of the class name on the selected elements.
+* **toggleClass** - Adds or removes the class depending on the existence of the class name on the selected elements.
 * **trigger** - Fires the given event on the selected element.
 * **val** - Gets or sets the value of the selected element.
 * **width** - Gets or sets the width of the selected element.
 * **ajax** - Sends an XMLHttpRequest.
 * **cookie** - Gets, sets or removes a cookie. In order to remove the cookie give the data as an empty string and daysToExpire as -1.
 * **each** - Iterates over objects and arrays.
-* **escapeString** - Escapes all the special charachters in the given text.
+* **escapeString** - Escapes all the special characters in the given text.
 * **ready** - Calls the callback when the document is loaded.
-* **replaceAll** - Replaces all the occurences of the given value in the string with the replacement string.
+* **replaceAll** - Replaces all the occurrences of the given value in the string with the replacement string.
 * **state** - Watches an element, pushes and updates its value on location change. Set the selector to body if you want the whole page to change on route change.
 * **storage** - Gets, sets or removes the given local storage. Use empty string as value to remove.
 * **trim** - Removes all the spaces in the given string.
-* **unescapeString** - Unescapes all the special charachters in the given text.
+* **unescapeString** - Unescapes all the special characters in the given text.
 
 **For more details on the functions and how to use them please visit the [AutoMagic Page](http://a-jafari.com/Projects/AutoMagic)**
 

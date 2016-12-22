@@ -1109,7 +1109,8 @@ window.AutoMagicConstructor.prototype.siblings=function () {
         v;
     if (arg.length > 0) {
         var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
-        for(i=0, nodeLength=elem.parentNode.childNodes.length, v=elem.parentNode.childNodes[i]; i < nodeLength; i++){
+        for(i=0, nodeLength=elem.parentNode.childNodes.length; i < nodeLength; i++){
+            var v=elem.parentNode.childNodes[i];
             if (v !== elem && v.nodeType === 1 && matchesSelector.call(v, arg[0])) {
                 output.push(v);
             }
@@ -1219,6 +1220,11 @@ window.AutoMagicConstructor.prototype.width=function () {
     } else if (typeof arg[0] === 'number') {
         for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             elem.style.width = arg[0] + 'px';
+        }
+        return this;
+    } else if (typeof arg[0] === 'string') {
+        for(var index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
+            elem.style.width = arg[0];
         }
         return this;
     }
@@ -1345,14 +1351,20 @@ window.AutoMagic.cookie=function(){
 window.AutoMagic.each = function() {
     var arg = arguments;
     if(Object.prototype.toString.call(arg[0]) === '[object Array]'){
-        for(var index=0, paramLength=arg[0].length, param=arg[0][index]; index < paramLength; index++){
+        for(var index=0, paramLength=arg[0].length; index < paramLength; index++){
+            var param=arg[0][index];
             arg[1].apply(param,[param,index]);
         }
     }
     else if(typeof arg[0]==='object'){
+        var index=0;
         for(var key in arg[0]){
-            arg[1].apply(arg[0][key], [key, arg[0][key]]);
+            arg[1].apply(arg[0][key], [key, arg[0][key],index]);
+            index++;
         }
+    }
+    else{
+        am.throwError('SyntaxError: Please provide an array or an object.');
     }
 };
 
@@ -1378,13 +1390,11 @@ window.AutoMagic.escapeString = function() {
 //document ready
 //arguments: callback
 //-----------function-------------
+document.addEventListener("DOMContentLoaded", function() {
+    window.AutoMagic.ready.fired=true;
+});
 window.AutoMagic.ready = function() {
     var arg = arguments;
-    document.addEventListener("DOMContentLoaded", function(event) {
-        window.AutoMagic.ready.fired=true;
-        arg[0]();
-        return;
-    });
     if(window.AutoMagic.ready.fired){
         arg[0]();
     }
@@ -1463,10 +1473,9 @@ window.AutoMagic.throwError = function() {
 //arguments: string
 //-----------string-------------
 window.AutoMagic.trim = function() {
-    var arg = arguments,
-        regex = new RegExp(/\s/, 'g');
+    var arg = arguments;
     if(typeof arg[0]==='string'){
-        return arg[0].replace(regex, '');
+        return arg[0].split(' ').join('');
     }
     return undefined;
 };
