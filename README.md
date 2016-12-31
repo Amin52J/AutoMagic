@@ -20,6 +20,10 @@ You can use **npm** to install AutoMagic, simply run the command `npm install au
 
 OR
 
+You can use **bower** to install AutoMagic, simply run the command `bower install automagic`
+
+OR
+
 You can [download the complete package](http://a-jafari.com/Files/AutoMagic.zip) or customize your own library [here](http://a-jafari.com/Projects/AutoMagic).
 
 ## Documentation
