@@ -1,6 +1,6 @@
 {
   "name": "automagic",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A magically fast, lightweight and customizable Javascript library.",
   "main": "AutoMagic.js",
   "scripts": {

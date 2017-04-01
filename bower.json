@@ -1,0 +1,27 @@
+{
+  "name": "automagic",
+  "description": "A magically fast, lightweight and customizable Javascript library.",
+  "main": "AutoMagic.js",
+  "authors": [
+    "Amin Jafari"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "automagic",
+    "javascript",
+    "js",
+    "library",
+    "customizable",
+    "fast",
+    "high",
+    "performance"
+  ],
+  "homepage": "https://github.com/Amin52J/AutoMagic",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

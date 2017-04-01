@@ -1,4 +1,4 @@
-//version 1.1.0
+//version 1.0.2
 
 //defining the constructor
 window.AutoMagicConstructor=function(){
@@ -10,7 +10,7 @@ window.AutoMagicConstructor=function(){
 //************************************************************
 //global functions *******************************************---------------------------------------------------------
 //************************************************************
-function getSupportedProp(proparray) {
+function AMgetSupportedProp(proparray) {
     var root = document.documentElement;
     for (var i = 0; i < proparray.length; i++) {
         if (proparray[i] in root.style) {
@@ -19,13 +19,13 @@ function getSupportedProp(proparray) {
     }
 }
 
-function toCamelCase(str) {
+function AMtoCamelCase(str) {
     return str.replace(/(\-[a-z])/g, function($1) {
         return $1.toUpperCase().replace('-', '');
     });
 }
 
-var vendors = [
+var AMvendors = [
     '-webkit-',
     '-o-',
     '-moz-',
@@ -33,7 +33,7 @@ var vendors = [
     ''
 ];
 
-function scrollTo(to, duration, direction,elem) {
+function AMscrollTo(to, duration, direction,elem) {
     if (duration <= 0) return;
     var difference = to - elem[direction];
     var perTick = difference / duration * 10;
@@ -41,17 +41,17 @@ function scrollTo(to, duration, direction,elem) {
     setTimeout(function() {
         elem[direction] = elem[direction] + perTick;
         if (elem[direction] === to) return;
-        scrollTo(to, duration - 10, direction,elem);
+        AMscrollTo(to, duration - 10, direction,elem);
     }, 10);
 }
 
-function setProp(prop,value){
+function AMsetProp(prop,value){
     setTimeout(function() {
         elem.style[prop] = value;
     }, 10);
 }
 
-function pushHandler(elem,event,selector,callback){
+function AMpushHandler(elem,event,selector,callback){
     elem.handlers.push({
         event:event,
         handler:function(e) {
@@ -147,26 +147,26 @@ window.AutoMagicConstructor.prototype.animate= function() {
         elem;
     if (typeof arg[1] === 'number') {
         propArray = [];
-        for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-            vendor=vendors[i];
-            propArray.push(toCamelCase(vendor + 'transition-duration'));
+        for(i=0, vendorsLength=AMvendors.length; i < vendorsLength; i++){
+            vendor=AMvendors[i];
+            propArray.push(AMtoCamelCase(vendor + 'transition-duration'));
         }
-        transitionDuration = getSupportedProp(propArray);
+        transitionDuration = AMgetSupportedProp(propArray);
     }
     if (typeof arg[2] === 'string') {
         propArray = [];
-        for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-            vendor=vendors[i];
-            propArray.push(toCamelCase(vendor + 'transition-timing-function'));
+        for(i=0, vendorsLength=AMvendors.length; i < vendorsLength; i++){
+            vendor=AMvendors[i];
+            propArray.push(AMtoCamelCase(vendor + 'transition-timing-function'));
         }
-        transitionTimingFunction = getSupportedProp(propArray);
+        transitionTimingFunction = AMgetSupportedProp(propArray);
     }
     propArray = [];
-    for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-        vendor=vendors[i];
-        propArray.push(toCamelCase(vendor + 'transition-property'));
+    for(i=0, vendorsLength=AMvendors.length; i < vendorsLength; i++){
+        vendor=AMvendors[i];
+        propArray.push(AMtoCamelCase(vendor + 'transition-property'));
     }
-    var transitionProperty = getSupportedProp(propArray);
+    var transitionProperty = AMgetSupportedProp(propArray);
 
     for(index=0, elemsLength=elems.length; index < elemsLength; index++){
         elem=elems[index];
@@ -227,12 +227,12 @@ window.AutoMagicConstructor.prototype.animate= function() {
 
     for (key in arg[0]) {
         propArray = [];
-        for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-            vendor=vendors[i];
-            propArray.push(toCamelCase(vendor + key));
+        for(i=0, vendorsLength=AMvendors.length; i < vendorsLength; i++){
+            vendor=AMvendors[i];
+            propArray.push(AMtoCamelCase(vendor + key));
         }
         properties.push({
-            prop: getSupportedProp(propArray),
+            prop: AMgetSupportedProp(propArray),
             value: arg[0][key]
         });
     }
@@ -243,7 +243,7 @@ window.AutoMagicConstructor.prototype.animate= function() {
         for(i=0, propertiesLength=properties.length, property=properties[i]; i < propertiesLength; i++){
             var style = window.getComputedStyle(elem);
             elem.style[property.prop] = style.getPropertyValue(property.prop);
-            setProp(property.prop,property.value);
+            AMsetProp(property.prop,property.value);
         }
     }
     setTimeout(function() {
@@ -338,28 +338,28 @@ window.AutoMagicConstructor.prototype.css=function () {
     } 
     else if(typeof arg[0] === 'string' && typeof arg[1] === 'string' && arg.length === 2){
         propArray = [];
-        for(i=0, vendorsLength=vendors.length; i < vendorsLength; i++){
-            vendor=vendors[i];
-            propArray.push(toCamelCase(vendor + arg[0]));
+        for(i=0, vendorsLength=AMvendors.length; i < vendorsLength; i++){
+            vendor=AMvendors[i];
+            propArray.push(AMtoCamelCase(vendor + arg[0]));
         }
         properties={
-            prop: getSupportedProp(propArray),
+            prop: AMgetSupportedProp(propArray),
             value: arg[1]
         };
         for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             style = window.getComputedStyle(elem);
             elem.style[arg[0]] = style.getPropertyValue(properties.prop);
-            setProp(properties.prop,properties.value);
+            AMsetProp(properties.prop,properties.value);
         }
     } else {
         for (var key in arg[0]) {
             propArray = [];
-            for(var x=0, vendorsLength2=vendors.length; x < vendorsLength2; x++){
-                vendor=vendors[x];
-                propArray.push(toCamelCase(vendor + key));
+            for(var x=0, vendorsLength2=AMvendors.length; x < vendorsLength2; x++){
+                vendor=AMvendors[x];
+                propArray.push(AMtoCamelCase(vendor + key));
             }
             properties.push({
-                prop: getSupportedProp(propArray),
+                prop: AMgetSupportedProp(propArray),
                 value: arg[0][key]
             });
         }
@@ -369,7 +369,7 @@ window.AutoMagicConstructor.prototype.css=function () {
                 property=properties[i];
                 style = window.getComputedStyle(elem);
                 elem.style[property.prop] = style.getPropertyValue(property.prop);
-                setProp(property.prop,property.value);
+                AMsetProp(property.prop,property.value);
             }
         }
     }
@@ -841,7 +841,7 @@ window.AutoMagicConstructor.prototype.on=function () {
             if(typeof elem.handlers==='undefined'){
                 elem.handlers=[];
             }
-            pushHandler(elem,arg[0],arg[1],arg[2]);
+            AMpushHandler(elem,arg[0],arg[1],arg[2]);
             elem.addEventListener(arg[0], elem.handlers[elem.handlers.length-1].handler,true);
         }
     }
@@ -1054,13 +1054,13 @@ window.AutoMagicConstructor.prototype.scroll=function () {
                 if (arg[2] <= 0) {
                     elem.scrollLeft = arg[1];
                 } else {
-                    scrollTo(arg[1], arg[2], 'scrollLeft',elem);
+                    AMscrollTo(arg[1], arg[2], 'scrollLeft',elem);
                 }
             } else if (arg[0].toLowerCase() === 'y' || arg[0].toLowerCase() === 'top') {
                 if (arg[2] <= 0) {
                     elem.scrollTop = arg[1];
                 } else {
-                    scrollTo(arg[1], arg[2], 'scrollTop',elem);
+                    AMscrollTo(arg[1], arg[2], 'scrollTop',elem);
                 }
             } else {
                 return undefined;
