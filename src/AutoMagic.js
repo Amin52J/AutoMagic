@@ -45,7 +45,7 @@ function AMscrollTo(to, duration, direction,elem) {
     }, 10);
 }
 
-function AMsetProp(prop,value){
+function AMsetProp(prop,value,elem){
     setTimeout(function() {
         elem.style[prop] = value;
     }, 10);
@@ -243,7 +243,7 @@ window.AutoMagicConstructor.prototype.animate= function() {
         for(i=0, propertiesLength=properties.length, property=properties[i]; i < propertiesLength; i++){
             var style = window.getComputedStyle(elem);
             elem.style[property.prop] = style.getPropertyValue(property.prop);
-            AMsetProp(property.prop,property.value);
+            AMsetProp(property.prop,property.value,elem);
         }
     }
     setTimeout(function() {
@@ -349,7 +349,7 @@ window.AutoMagicConstructor.prototype.css=function () {
         for(index=0, elemsLength=elems.length, elem=elems[index]; index < elemsLength; index++){
             style = window.getComputedStyle(elem);
             elem.style[arg[0]] = style.getPropertyValue(properties.prop);
-            AMsetProp(properties.prop,properties.value);
+            AMsetProp(properties.prop,properties.value,elem);
         }
     } else {
         for (var key in arg[0]) {
@@ -369,7 +369,7 @@ window.AutoMagicConstructor.prototype.css=function () {
                 property=properties[i];
                 style = window.getComputedStyle(elem);
                 elem.style[property.prop] = style.getPropertyValue(property.prop);
-                AMsetProp(property.prop,property.value);
+                AMsetProp(property.prop,property.value,elem);
             }
         }
     }
